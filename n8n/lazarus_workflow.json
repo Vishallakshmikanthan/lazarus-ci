@@ -97,9 +97,11 @@
     },
     {
       "parameters": {
-        "chatId": "",
-        "text": "=🚨 Lazarus SRE Incident #{{ $('Set: Remember Incident ID').item.json.incident_id }} Update:\nStatus: {{ $json.status.toUpperCase() }}\nSummary: {{ $json.summary || 'Pipeline remediated and verified' }}",
-        "additionalFields": {}
+        "chatId": "7843696928",
+        "text": "=🚨 <b>Lazarus SRE Incident #{{ $('Set: Remember Incident ID').item.json.incident_id }} Update</b>\n\n<b>Status:</b> {{ $json.status.toUpperCase() }}\n<b>Summary:</b> {{ $json.summary || 'Pipeline remediated and verified' }}",
+        "additionalFields": {
+          "parse_mode": "HTML"
+        }
       },
       "id": "node-telegram-notify-7",
       "name": "Telegram: Send SRE Alert",
