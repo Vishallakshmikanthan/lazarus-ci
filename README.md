@@ -1,5 +1,5 @@
 ---
-title: Ctrl + AI Agentic AI Hackathon CI/CD Repair Environment
+title: Lazarus-CI/CD Repair Environment
 emoji: "🔨"
 colorFrom: red
 colorTo: gray
