@@ -1,0 +1,325 @@
+{
+  "name": "Lazarus-CI Real GitHub Pipeline Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "seconds",
+              "secondsInterval": 10
+            }
+          ]
+        }
+      },
+      "id": "11111111-1111-1111-1111-111111111111",
+      "name": "Schedule (10s)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [200, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://api.github.com/repos/Vishallakshmikanthan/demo-ci-cd-pooling/actions/runs?branch=main&status=failure&per_page=1",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $env.GITHUB_TOKEN || 'YOUR_GITHUB_TOKEN' }}"
+            },
+            {
+              "name": "Accept",
+              "value": "application/vnd.github+json"
+            },
+            {
+              "name": "X-GitHub-Api-Version",
+              "value": "2022-11-28"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "22222222-2222-2222-2222-222222222222",
+      "name": "GitHub: Check Failed Runs",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [420, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $getWorkflowStaticData('global');\nconst runs = $input.first().json.workflow_runs || [];\nconst latest = runs[0];\nif (!latest || data.lastSeen === latest.id) {\n  return [];\n}\ndata.lastSeen = latest.id;\nreturn [{\n  json: {\n    run_id: latest.id,\n    sha: latest.head_sha,\n    url: latest.html_url,\n    title: latest.display_title || latest.name || 'CI Pipeline'\n  }\n}];"
+      },
+      "id": "33333333-3333-3333-3333-333333333333",
+      "name": "Deduplicate & Check New Run",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [660, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.telegram.org/bot{{ $env.TELEGRAM_TOKEN || 'YOUR_TELEGRAM_BOT_TOKEN' }}/sendMessage",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"chat_id\": \"7843696928\",\n  \"text\": \"🔴 CI FAILED on main\\nRun #\" + $json.run_id + \" · \\\"\" + $json.title + \"\\\"\\n\" + $json.url + \"\\n🤖 Lazarus-CI is investigating...\"\n}",
+        "options": {
+          "timeout": 15000
+        }
+      },
+      "id": "44444444-4444-4444-4444-444444444444",
+      "name": "Telegram: Alert Failure",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [880, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8100/incident/start",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"run_id\": $('Deduplicate & Check New Run').item.json.run_id\n}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "55555555-5555-5555-5555-555555555555",
+      "name": "Start Lazarus Incident",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1100, 300]
+    },
+    {
+      "parameters": {
+        "amount": 6,
+        "unit": "seconds"
+      },
+      "id": "66666666-6666-6666-6666-666666666666",
+      "name": "Wait 6s",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [1320, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=http://host.docker.internal:8100/incident/{{ $('Start Lazarus Incident').item.json.incident_id }}/status",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "77777777-7777-7777-7777-777777777777",
+      "name": "Poll Incident Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1540, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "condition_status",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "^(resolved|escalated)$",
+              "operator": {
+                "type": "string",
+                "operation": "regex"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "88888888-8888-8888-8888-888888888888",
+      "name": "Is Complete?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1760, 300]
+    },
+    {
+      "parameters": {
+        "dataType": "string",
+        "value1": "={{ $json.status }}",
+        "rules": {
+          "rules": [
+            {
+              "value2": "resolved",
+              "output": 0
+            },
+            {
+              "value2": "escalated",
+              "output": 1
+            }
+          ]
+        }
+      },
+      "id": "99999999-9999-9999-9999-999999999999",
+      "name": "Route Outcome",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [2000, 240]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.telegram.org/bot{{ $env.TELEGRAM_TOKEN || 'YOUR_TELEGRAM_BOT_TOKEN' }}/sendMessage",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"chat_id\": \"7843696928\",\n  \"text\": \"✅ RESOLVED by Lazarus-CI\\nPipeline is green again on main!\\nIncident #\" + $('Poll Incident Status').item.json.incident_id + \"\\n\" + $json.summary\n}",
+        "options": {
+          "timeout": 15000
+        }
+      },
+      "id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      "name": "Telegram: Resolved Alert",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2240, 180]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.telegram.org/bot{{ $env.TELEGRAM_TOKEN || 'YOUR_TELEGRAM_BOT_TOKEN' }}/sendMessage",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"chat_id\": \"7843696928\",\n  \"text\": \"🆘 ESCALATED by Lazarus-CI\\nIncident #\" + $('Poll Incident Status').item.json.incident_id + \"\\nReason: \" + ($json.summary || 'Escalated to on-call human engineer')\n}",
+        "options": {
+          "timeout": 15000
+        }
+      },
+      "id": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+      "name": "Telegram: Escalated Alert",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2240, 320]
+    }
+  ],
+  "connections": {
+    "Schedule (10s)": {
+      "main": [
+        [
+          {
+            "node": "GitHub: Check Failed Runs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GitHub: Check Failed Runs": {
+      "main": [
+        [
+          {
+            "node": "Deduplicate & Check New Run",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Deduplicate & Check New Run": {
+      "main": [
+        [
+          {
+            "node": "Telegram: Alert Failure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram: Alert Failure": {
+      "main": [
+        [
+          {
+            "node": "Start Lazarus Incident",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start Lazarus Incident": {
+      "main": [
+        [
+          {
+            "node": "Wait 6s",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 6s": {
+      "main": [
+        [
+          {
+            "node": "Poll Incident Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Poll Incident Status": {
+      "main": [
+        [
+          {
+            "node": "Is Complete?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Complete?": {
+      "main": [
+        [
+          {
+            "node": "Route Outcome",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait 6s",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route Outcome": {
+      "main": [
+        [
+          {
+            "node": "Telegram: Resolved Alert",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Telegram: Escalated Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

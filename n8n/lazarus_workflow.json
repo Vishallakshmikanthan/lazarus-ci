@@ -107,7 +107,13 @@
       "name": "Telegram: Send SRE Alert",
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1,
-      "position": [1520, 240]
+      "position": [1520, 240],
+      "credentials": {
+        "telegramApi": {
+          "id": "UQzKPUcY5btmpCNV",
+          "name": "Telegram account"
+        }
+      }
     }
   ],
   "connections": {
