@@ -1,0 +1,178 @@
+{
+  "name": "Lazarus-CI Incident Alert & Escalation Flow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "lazarus-alert",
+        "options": {}
+      },
+      "id": "node-webhook-1",
+      "name": "Webhook: Pipeline Alert",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "http://host.docker.internal:8100/incident/start",
+        "options": {},
+        "bodyParametersUi": {
+          "parameter": []
+        }
+      },
+      "id": "node-start-incident-2",
+      "name": "HTTP: Start Lazarus Incident",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "number": [
+            {
+              "name": "incident_id",
+              "value": "={{ $json.incident_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "node-set-incident-id-3",
+      "name": "Set: Remember Incident ID",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "amount": 5,
+        "unit": "seconds"
+      },
+      "id": "node-wait-4",
+      "name": "Wait 5s",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [880, 300]
+    },
+    {
+      "parameters": {
+        "url": "=http://host.docker.internal:8100/incident/{{ $('Set: Remember Incident ID').item.json.incident_id }}/status",
+        "options": {}
+      },
+      "id": "node-check-status-5",
+      "name": "HTTP: Check Incident Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [1080, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.status }}",
+              "operation": "regex",
+              "value2": "^(resolved|escalated)$"
+            }
+          ]
+        }
+      },
+      "id": "node-if-done-6",
+      "name": "IF Resolved or Escalated",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [1280, 300]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $env.TELEGRAM_CHAT_ID || '-100123456789' }}",
+        "text": "=🚨 Lazarus SRE Incident #{{ $('Set: Remember Incident ID').item.json.incident_id }} Update:\nStatus: {{ $json.status.toUpperCase() }}\nSummary: {{ $json.summary || 'Pipeline remediated and verified' }}",
+        "additionalFields": {}
+      },
+      "id": "node-telegram-notify-7",
+      "name": "Telegram: Send SRE Alert",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [1520, 240]
+    }
+  ],
+  "connections": {
+    "Webhook: Pipeline Alert": {
+      "main": [
+        [
+          {
+            "node": "HTTP: Start Lazarus Incident",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP: Start Lazarus Incident": {
+      "main": [
+        [
+          {
+            "node": "Set: Remember Incident ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set: Remember Incident ID": {
+      "main": [
+        [
+          {
+            "node": "Wait 5s",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 5s": {
+      "main": [
+        [
+          {
+            "node": "HTTP: Check Incident Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP: Check Incident Status": {
+      "main": [
+        [
+          {
+            "node": "IF Resolved or Escalated",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Resolved or Escalated": {
+      "main": [
+        [
+          {
+            "node": "Telegram: Send SRE Alert",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait 5s",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
