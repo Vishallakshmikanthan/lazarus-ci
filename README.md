@@ -1,5 +1,5 @@
 ---
-title: Meta Hackathon CI/CD Repair Environment
+title: Ctrl + AI Agentic AI Hackathon CI/CD Repair Environment
 emoji: "🔨"
 colorFrom: red
 colorTo: gray

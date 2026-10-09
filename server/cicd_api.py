@@ -519,7 +519,7 @@ def _build_landing_page() -> str:
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Meta Hackathon CI/CD Repair Environment</title>
+    <title>Ctrl + AI Agentic AI Hackathon CI/CD Repair Environment</title>
     <style>
         :root {
             --bg: #08111f;
@@ -627,7 +627,7 @@ def _build_landing_page() -> str:
 <body>
     <main class="wrap">
         <section class="hero">
-            <div class="badge">Meta Hackathon · CI/CD repair lab</div>
+            <div class="badge">Ctrl + AI Agentic AI Hackathon · CI/CD repair lab</div>
             <h1>Something should be visible here.</h1>
             <p>
                 The Space is alive, and the API is serving the repair environment. Use the links below to inspect

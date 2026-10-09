@@ -4,7 +4,7 @@
 # This source code is licensed under the BSD-style license found in the
 # LICENSE file in the root directory of this source tree.
 
-"""Data models for the Meta Hackathon CI/CD repair environment."""
+"""Data models for the Ctrl + AI Agentic AI Hackathon CI/CD repair environment."""
 
 from dataclasses import dataclass, field
 from typing import Dict, List

@@ -11,7 +11,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "openenv-meta_hackathon"
 version = "0.1.0"
-description = "Meta Hackathon environment for OpenEnv"
+description = "Ctrl + AI Agentic AI Hackathon environment for OpenEnv"
 requires-python = ">=3.10"
 dependencies = [
     # Core OpenEnv runtime (provides FastAPI server + HTTP client types)

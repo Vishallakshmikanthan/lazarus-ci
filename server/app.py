@@ -5,7 +5,7 @@
 # LICENSE file in the root directory of this source tree.
 
 """
-FastAPI application for the Meta Hackathon Environment.
+FastAPI application for the Ctrl + AI Agentic AI Hackathon Environment.
 
 This module creates an HTTP server that exposes the MetaHackathonEnvironment
 over HTTP and WebSocket endpoints, compatible with EnvClient.
@@ -633,7 +633,7 @@ def my_custom_ui(web_manager, action_fields, metadata, is_chat_env, title, quick
             gr.update(value=suggestion["value"]),
         )
 
-    with gr.Blocks(elem_classes=["mh-shell"], title=title or "Meta Hackathon") as demo:
+    with gr.Blocks(elem_classes=["mh-shell"], title=title or "Ctrl + AI Agentic AI Hackathon") as demo:
         observation_state = gr.State({})
         episode_state = gr.State({})
         suggestion_state = gr.State({})
@@ -642,7 +642,7 @@ def my_custom_ui(web_manager, action_fields, metadata, is_chat_env, title, quick
 
         gr.HTML(
             "<div class='mh-hero'>"
-            f"<div class='mh-badge'>{html.escape(_safe_text(title, 'Meta Hackathon'))}</div>"
+            f"<div class='mh-badge'>{html.escape(_safe_text(title, 'Ctrl + AI Agentic AI Hackathon'))}</div>"
             "<h1>Testing-first episode UI with one-click action suggestions</h1>"
             "<p>This interface keeps the episode timeline, findings, pipeline status, and action builder visible at the same time. "
             "Use the suggested action button for the fastest path, or edit the fields manually when you need to test a specific branch.</p>"
@@ -866,7 +866,7 @@ def _build_landing_page() -> str:
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Meta Hackathon CI/CD Repair Environment</title>
+    <title>Ctrl + AI Agentic AI Hackathon CI/CD Repair Environment</title>
     <style>
         :root {
             color-scheme: light;
@@ -1004,7 +1004,7 @@ def _build_landing_page() -> str:
 <body>
     <main class="wrap">
         <section class="hero">
-            <div class="badge">Meta Hackathon · CI/CD repair lab</div>
+            <div class="badge">Ctrl + AI Agentic AI Hackathon · CI/CD repair lab</div>
             <h1>Something should be visible here.</h1>
             <p class="lede">
                 This Space exposes a full repair environment, but the landing page should not be blank.
@@ -1124,7 +1124,7 @@ async def startup_event():
     cicd_api_host = os.getenv("CICD_API_HOST", "0.0.0.0")
 
     logger.info("=" * 60)
-    logger.info("Starting Meta Hackathon Environment Server")
+    logger.info("Starting Ctrl + AI Agentic AI Hackathon Environment Server")
     logger.info("=" * 60)
 
     # Initialise SQLite DBs at runtime so they exist on HF Spaces (ephemeral FS,
@@ -1185,7 +1185,7 @@ def main():
         os.environ["CICD_API_PORT"] = str(args.cicd_api_port)
 
     print("\n" + "=" * 60)
-    print("Meta Hackathon CI/CD Environment - Theme #3 Compliant")
+    print("Ctrl + AI Agentic AI Hackathon CI/CD Environment - Theme #3 Compliant")
     print("=" * 60)
     print(f"Main Server: http://{args.host}:{args.port}")
     print(f"CI/CD API: http://{args.host}:{os.getenv('CICD_API_PORT', '8001')}")

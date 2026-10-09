@@ -1,5 +1,5 @@
 ---
-title: Meta Hackathon CI/CD Repair Environment
+title: Ctrl + AI Agentic AI Hackathon CI/CD Repair Environment
 emoji: "🔨"
 colorFrom: red
 colorTo: gray
@@ -14,7 +14,7 @@ tags:
   - rubric-judge
 ---
 
-## Meta Hackathon CI/CD Repair Environment
+## Ctrl + AI Agentic AI Hackathon CI/CD Repair Environment
 
 This Space hosts a deterministic OpenEnv benchmark for CI/CD incident diagnosis and remediation.
 

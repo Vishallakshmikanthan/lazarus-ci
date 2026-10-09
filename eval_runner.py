@@ -1,4 +1,4 @@
-"""Deterministic benchmark evaluator for the Meta Hackathon environment."""
+"""Deterministic benchmark evaluator for the Ctrl + AI Agentic AI Hackathon environment."""
 
 from __future__ import annotations
 

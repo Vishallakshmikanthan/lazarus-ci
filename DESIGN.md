@@ -1,4 +1,4 @@
-# Meta Hackathon Environment Design
+# Ctrl + AI Agentic AI Hackathon Environment Design
 
 ## 1. Purpose
 

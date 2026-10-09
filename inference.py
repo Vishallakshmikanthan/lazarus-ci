@@ -1,4 +1,4 @@
-"""Compatibility entry point for the Meta Hackathon inference baseline."""
+"""Compatibility entry point for the Ctrl + AI Agentic AI Hackathon inference baseline."""
 
 from __future__ import annotations
 

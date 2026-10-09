@@ -4,7 +4,7 @@
 # This source code is licensed under the BSD-style license found in the
 # LICENSE file in the root directory of this source tree.
 
-"""Meta Hackathon Environment Client."""
+"""Ctrl + AI Agentic AI Hackathon Environment Client."""
 
 from typing import Dict
 
@@ -19,7 +19,7 @@ class MetaHackathonEnv(
     EnvClient[MetaHackathonAction, MetaHackathonObservation, State]
 ):
     """
-    Client for the Meta Hackathon Environment.
+    Client for the Ctrl + AI Agentic AI Hackathon Environment.
 
     This client maintains a persistent WebSocket connection to the environment server,
     enabling efficient multi-step interactions with lower latency.

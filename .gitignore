@@ -9,4 +9,5 @@ __pycache__
 *.db
 lazarus_incidents.json
 bench_*.json
-*.egg-info/
+*.egg-info/
+.gemini/

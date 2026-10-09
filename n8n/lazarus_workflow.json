@@ -1,5 +1,11 @@
 {
+  "id": "LzRus9CI8100wflw",
   "name": "Lazarus-CI Incident Alert & Escalation Flow",
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true
+  },
   "nodes": [
     {
       "parameters": {

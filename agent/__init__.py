@@ -1,2 +1,2 @@
-"""Agentic baseline runner modules for Meta Hackathon inference."""
+"""Agentic baseline runner modules for Ctrl + AI Agentic AI Hackathon inference."""
 
