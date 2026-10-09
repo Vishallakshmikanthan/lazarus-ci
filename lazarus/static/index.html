@@ -1,73 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LAZARUS-CI // Autonomous SRE &amp; Self-Healing CI/CD</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap"
-    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      /* Backgrounds: Light Blue Executive Gradient & Half-White Frosted Glass Layers */
-      --bg-page: #edf5fd;
-      --card-bg: rgba(255, 255, 255, 0.78);
-      --panel-bg: rgba(255, 255, 255, 0.78);
-      --card-inner: rgba(243, 248, 255, 0.75);
-      --dark-layer: #0b1120;
-      --dark-layer-elevated: #131d33;
-
-      /* Borders: Soft Frosted Ice-Blue Borders */
-      --border-subtle: rgba(203, 224, 252, 0.7);
-      --border-card: rgba(186, 215, 250, 0.7);
-      --border-glow: rgba(37, 99, 235, 0.45);
+      --bg-dark: #0a0d13;
+      --panel-bg: rgba(18, 23, 34, 0.78);
+      --card-bg: rgba(23, 30, 44, 0.88);
+      --card-inner: rgba(15, 20, 30, 0.9);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-glow: rgba(56, 139, 253, 0.4);
+      --text-main: #f0f6fc;
+      --text-muted: #8b949e;
+      --text-dim: #484f58;
       
-      /* High-Contrast Bright Black Text on White */
-      --text-main: #090d16;
-      --text-muted: #475569;
-      --text-dim: #64748b;
-      --text-on-dark: #f8fafc;
-      --text-on-dark-muted: #94a3b8;
-
-      /* Vibrant Accents */
-      --accent-blue: #2563eb;
-      --accent-blue-hover: #1d4ed8;
-      --accent-cyan: #0284c7;
-      --color-pass: #16a34a;
-      --color-pass-glow: #22c55e;
-      --color-fail: #dc2626;
-      --color-fail-glow: #ef4444;
-      --color-warn: #d97706;
-      --color-purple: #7c3aed;
-      --color-running: #2563eb;
-
+      --accent-blue: #388bfd;
+      --accent-cyan: #39c5bb;
+      --color-pass: #2ea043;
+      --color-pass-glow: #3fb950;
+      --color-fail: #f85149;
+      --color-fail-glow: #ff7b72;
+      --color-warn: #e3b341;
+      --color-purple: #a371f7;
+      --color-running: #2f81f7;
+      
       --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       --font-mono: 'Fira Code', monospace;
-
-      /* Premium Drop Shadows */
-      --shadow-card: 0 10px 30px -5px rgba(15, 23, 42, 0.08), 0 4px 12px -2px rgba(15, 23, 42, 0.04);
-      --shadow-dark-layer: 0 10px 25px -3px rgba(11, 17, 32, 0.35), 0 4px 10px -2px rgba(11, 17, 32, 0.2);
-      --shadow-btn: 0 4px 14px rgba(11, 17, 32, 0.28);
-      --shadow-btn-hover: 0 6px 20px rgba(11, 17, 32, 0.4);
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
     body {
-      background-color: var(--bg-page);
-      background-image:
-        radial-gradient(circle at 10% 10%, rgba(56, 189, 248, 0.16) 0%, transparent 45%),
-        radial-gradient(circle at 90% 15%, rgba(99, 102, 241, 0.12) 0%, transparent 45%),
-        radial-gradient(circle at 50% 90%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
-        linear-gradient(135deg, #f0f7ff 0%, #e0f2fe 40%, #dbeafe 75%, #f0f7ff 100%);
-      background-attachment: fixed;
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 12% 10%, rgba(56, 139, 253, 0.09) 0%, transparent 40%),
+        radial-gradient(circle at 88% 18%, rgba(248, 81, 73, 0.07) 0%, transparent 40%),
+        radial-gradient(circle at 50% 90%, rgba(163, 113, 247, 0.06) 0%, transparent 45%);
       color: var(--text-main);
       font-family: var(--font-sans);
       min-height: 100vh;
@@ -77,17 +50,17 @@
       gap: 20px;
     }
 
-    /* Top Navigation (Floating Dark Upper Layer) */
+    /* Top Nav / Header */
     header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: 16px 24px;
-      background: var(--dark-layer);
-      border: 1px solid #1e293b;
-      border-radius: 14px;
-      box-shadow: var(--shadow-dark-layer);
-      color: var(--text-on-dark);
+      background: var(--panel-bg);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     }
 
     .brand {
@@ -97,31 +70,31 @@
     }
 
     .brand-logo {
-      width: 44px;
-      height: 44px;
+      width: 42px;
+      height: 42px;
       border-radius: 10px;
-      background: linear-gradient(135deg, #2563eb, #38bdf8);
+      background: linear-gradient(135deg, #2ea043, #388bfd);
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 800;
       font-size: 22px;
       color: white;
-      box-shadow: 0 0 20px rgba(56, 189, 248, 0.45);
+      box-shadow: 0 0 20px rgba(56, 139, 253, 0.45);
     }
 
     .brand-title {
       font-size: 20px;
       font-weight: 800;
       letter-spacing: -0.5px;
-      background: linear-gradient(90deg, #ffffff, #7dd3fc 65%, #cbd5e1);
+      background: linear-gradient(90deg, #ffffff, #a5d6ff 60%, #8b949e);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
 
     .brand-subtitle {
       font-size: 11px;
-      color: #38bdf8;
+      color: var(--accent-cyan);
       letter-spacing: 0.6px;
       text-transform: uppercase;
       font-weight: 600;
@@ -147,32 +120,10 @@
       text-transform: uppercase;
     }
 
-    .badge-running {
-      background: rgba(56, 189, 248, 0.18);
-      color: #38bdf8;
-      border: 1px solid #0284c7;
-    }
-
-    .badge-passed {
-      background: rgba(34, 197, 94, 0.18);
-      color: #4ade80;
-      border: 1px solid #16a34a;
-      box-shadow: 0 0 10px rgba(34, 197, 94, 0.25);
-    }
-
-    .badge-failed {
-      background: rgba(239, 68, 68, 0.18);
-      color: #f87171;
-      border: 1px solid #dc2626;
-      box-shadow: 0 0 10px rgba(239, 68, 68, 0.25);
-    }
-
-    .badge-awaiting {
-      background: rgba(245, 158, 11, 0.18);
-      color: #fbbf24;
-      border: 1px solid #d97706;
-      animation: pulseAlert 1.5s infinite;
-    }
+    .badge-running { background: rgba(56, 139, 253, 0.15); color: var(--accent-blue); border: 1px solid var(--accent-blue); }
+    .badge-passed { background: rgba(46, 160, 67, 0.18); color: var(--color-pass-glow); border: 1px solid var(--color-pass); box-shadow: 0 0 10px rgba(46, 160, 67, 0.2); }
+    .badge-failed { background: rgba(248, 81, 73, 0.18); color: var(--color-fail-glow); border: 1px solid var(--color-fail); box-shadow: 0 0 10px rgba(248, 81, 73, 0.2); }
+    .badge-awaiting { background: rgba(227, 179, 65, 0.18); color: var(--color-warn); border: 1px solid var(--color-warn); animation: pulseAlert 1.5s infinite; }
 
     @keyframes pulseAlert {
       0%, 100% { opacity: 1; transform: scale(1); }
@@ -187,39 +138,36 @@
     }
 
     @media (max-width: 1024px) {
-      .dashboard-grid {
-        grid-template-columns: 1fr;
-      }
+      .dashboard-grid { grid-template-columns: 1fr; }
     }
 
-    /* Cards (Frosted Half-White Glass Surface that Blends with the Blue Gradient) */
+    /* Cards */
     .card {
-      background: var(--card-bg);
-      backdrop-filter: blur(20px) saturate(180%);
-      -webkit-backdrop-filter: blur(20px) saturate(180%);
-      border: 1px solid var(--border-card);
-      border-radius: 14px;
-      padding: 22px;
+      background: var(--panel-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 20px;
       display: flex;
       flex-direction: column;
       gap: 16px;
-      box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.06), 0 4px 12px -2px rgba(15, 23, 42, 0.03);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
     }
 
     .card-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 1px solid #e2e8f0;
+      border-bottom: 1px solid var(--border-subtle);
       padding-bottom: 12px;
     }
 
     .card-title {
       font-size: 14px;
-      font-weight: 800;
+      font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.8px;
-      color: var(--text-main);
+      color: var(--text-muted);
       display: flex;
       align-items: center;
       gap: 8px;
@@ -249,24 +197,22 @@
       flex-wrap: wrap;
     }
 
-    /* Dark Preset Toolbar (Pops from the white card) */
     .demo-preset-group {
       display: inline-flex;
       align-items: center;
-      background: var(--dark-layer);
+      background: rgba(0, 0, 0, 0.45);
       padding: 4px;
-      border-radius: 10px;
-      border: 1px solid #1e293b;
+      border-radius: 8px;
+      border: 1px solid var(--border-subtle);
       gap: 4px;
-      box-shadow: var(--shadow-btn);
     }
 
     .preset-label {
       font-size: 11px;
-      font-weight: 800;
+      font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.6px;
-      color: #94a3b8;
+      color: var(--text-muted);
       padding: 0 8px;
       display: flex;
       align-items: center;
@@ -279,10 +225,10 @@
       border-radius: 6px;
       border: 1px solid transparent;
       cursor: pointer;
-      font-weight: 700;
+      font-weight: 600;
       transition: all 0.2s ease;
       background: transparent;
-      color: #f8fafc;
+      color: var(--text-main);
       display: inline-flex;
       align-items: center;
       gap: 6px;
@@ -290,78 +236,70 @@
     }
 
     .btn-preset:hover {
-      background: rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.08);
       transform: translateY(-1px);
     }
 
     .btn-preset.risk-gate {
-      color: #fca5a5;
-      border-color: rgba(239, 68, 68, 0.4);
-      background: rgba(239, 68, 68, 0.15);
+      color: #ff7b72;
+      border-color: rgba(248, 81, 73, 0.3);
+      background: rgba(248, 81, 73, 0.08);
     }
     .btn-preset.risk-gate:hover {
-      background: rgba(239, 68, 68, 0.3);
-      border-color: #ef4444;
-      box-shadow: 0 0 14px rgba(239, 68, 68, 0.4);
+      background: rgba(248, 81, 73, 0.2);
+      border-color: #f85149;
+      box-shadow: 0 0 12px rgba(248, 81, 73, 0.3);
     }
 
     .btn-preset.auto-heal {
-      color: #86efac;
-      border-color: rgba(34, 197, 94, 0.4);
-      background: rgba(34, 197, 94, 0.15);
+      color: #7ee787;
+      border-color: rgba(46, 160, 67, 0.3);
+      background: rgba(46, 160, 67, 0.08);
     }
     .btn-preset.auto-heal:hover {
-      background: rgba(34, 197, 94, 0.3);
-      border-color: #22c55e;
-      box-shadow: 0 0 14px rgba(34, 197, 94, 0.4);
+      background: rgba(46, 160, 67, 0.2);
+      border-color: #2ea043;
+      box-shadow: 0 0 12px rgba(46, 160, 67, 0.3);
     }
 
     .btn-preset.cascade {
-      color: #d8b4fe;
-      border-color: rgba(168, 85, 247, 0.4);
-      background: rgba(168, 85, 247, 0.15);
+      color: #d2a8ff;
+      border-color: rgba(163, 113, 247, 0.3);
+      background: rgba(163, 113, 247, 0.08);
     }
     .btn-preset.cascade:hover {
-      background: rgba(168, 85, 247, 0.3);
-      border-color: #a855f7;
-      box-shadow: 0 0 14px rgba(168, 85, 247, 0.4);
+      background: rgba(163, 113, 247, 0.2);
+      border-color: #a371f7;
+      box-shadow: 0 0 12px rgba(163, 113, 247, 0.3);
     }
 
     .btn-preset.escalate {
-      color: #fde047;
-      border-color: rgba(245, 158, 11, 0.4);
-      background: rgba(245, 158, 11, 0.15);
+      color: #e3b341;
+      border-color: rgba(227, 179, 65, 0.3);
+      background: rgba(227, 179, 65, 0.08);
     }
     .btn-preset.escalate:hover {
-      background: rgba(245, 158, 11, 0.3);
-      border-color: #f59e0b;
-      box-shadow: 0 0 14px rgba(245, 158, 11, 0.4);
+      background: rgba(227, 179, 65, 0.2);
+      border-color: #e3b341;
+      box-shadow: 0 0 12px rgba(227, 179, 65, 0.3);
     }
 
-    /* Active Chaos Banner (Floating Dark Alert Strip) */
+    /* Active Chaos Injection Banner */
     .active-chaos-banner {
       display: none;
-      background: var(--dark-layer);
-      border: 1.5px solid #ef4444;
-      border-radius: 10px;
-      padding: 14px 20px;
+      background: linear-gradient(90deg, rgba(248, 81, 73, 0.14), rgba(56, 139, 253, 0.08));
+      border: 1px solid rgba(248, 81, 73, 0.4);
+      border-radius: 8px;
+      padding: 12px 18px;
       align-items: center;
       justify-content: space-between;
       gap: 14px;
-      box-shadow: 0 10px 24px rgba(239, 68, 68, 0.25);
       animation: chaosPulse 3s infinite alternate;
-      color: #f8fafc;
     }
 
     @keyframes chaosPulse {
-      0% {
-        border-color: rgba(239, 68, 68, 0.6);
-        box-shadow: 0 0 14px rgba(239, 68, 68, 0.2);
-      }
-      100% {
-        border-color: #ef4444;
-        box-shadow: 0 0 26px rgba(239, 68, 68, 0.45);
-      }
+      0% { border-color: rgba(248, 81, 73, 0.35); box-shadow: 0 0 12px rgba(248, 81, 73, 0.15); }
+      100% { border-color: rgba(248, 81, 73, 0.75); box-shadow: 0 0 24px rgba(248, 81, 73, 0.35); }
     }
 
     .active-chaos-info {
@@ -372,9 +310,9 @@
     }
 
     .active-chaos-title {
-      font-size: 14px;
-      font-weight: 800;
-      color: #fca5a5;
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #ff7b72;
       display: flex;
       align-items: center;
       gap: 8px;
@@ -382,12 +320,11 @@
 
     .active-chaos-meta {
       font-size: 12px;
-      color: #94a3b8;
+      color: var(--text-muted);
       font-family: var(--font-mono);
-      background: #1e293b;
-      padding: 4px 10px;
-      border-radius: 6px;
-      border: 1px solid #334155;
+      background: rgba(0, 0, 0, 0.35);
+      padding: 3px 8px;
+      border-radius: 4px;
     }
 
     .active-chaos-flow {
@@ -395,36 +332,28 @@
       align-items: center;
       gap: 8px;
       font-size: 11.5px;
-      color: #38bdf8;
-      font-weight: 700;
+      color: var(--accent-cyan);
+      font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
 
-    /* Chaos Matrix Drawer (Dark Floating Pop Layer) */
+    /* Chaos Matrix Drawer */
     .chaos-drawer {
       display: none;
       flex-direction: column;
-      gap: 16px;
-      background: var(--dark-layer);
-      border: 1px solid #1e293b;
-      border-radius: 12px;
-      padding: 20px;
+      gap: 14px;
+      background: rgba(14, 18, 28, 0.96);
+      border: 1px solid rgba(56, 139, 253, 0.3);
+      border-radius: 10px;
+      padding: 16px;
       margin-top: 4px;
-      box-shadow: var(--shadow-dark-layer);
-      color: #f8fafc;
       animation: drawerSlide 0.25s ease-out;
     }
 
     @keyframes drawerSlide {
-      from {
-        opacity: 0;
-        transform: translateY(-8px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .drawer-controls {
@@ -439,27 +368,26 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      background: #131d33;
-      border: 1px solid #334155;
-      border-radius: 8px;
-      padding: 8px 14px;
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 7px 12px;
       flex: 1;
-      max-width: 340px;
-      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+      max-width: 320px;
     }
 
     .search-box:focus-within {
-      border-color: #38bdf8;
-      box-shadow: 0 0 12px rgba(56, 189, 248, 0.35);
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 10px rgba(56, 139, 253, 0.25);
     }
 
     .search-input {
       background: transparent;
       border: none;
       outline: none;
-      color: #ffffff;
+      color: var(--text-main);
       font-family: var(--font-sans);
-      font-size: 12.5px;
+      font-size: 12px;
       width: 100%;
     }
 
@@ -470,85 +398,75 @@
     }
 
     .cat-tab {
-      background: #1e293b;
-      border: 1px solid #334155;
-      border-radius: 8px;
-      padding: 6px 14px;
-      font-size: 12px;
-      color: #cbd5e1;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 5px 12px;
+      font-size: 11.5px;
+      color: var(--text-muted);
       cursor: pointer;
       transition: all 0.15s ease;
-      font-weight: 700;
+      font-weight: 600;
       font-family: var(--font-sans);
     }
 
-    .cat-tab:hover,
-    .cat-tab.active {
-      background: #2563eb;
-      border-color: #38bdf8;
-      color: #ffffff;
-      box-shadow: 0 0 12px rgba(37, 99, 235, 0.45);
+    .cat-tab:hover, .cat-tab.active {
+      background: rgba(56, 139, 253, 0.16);
+      border-color: var(--accent-blue);
+      color: #79c0ff;
     }
 
     .cat-tab.active-risk {
-      background: #dc2626;
-      border-color: #f87171;
-      color: #ffffff;
-      box-shadow: 0 0 12px rgba(220, 38, 38, 0.45);
+      background: rgba(248, 81, 73, 0.16);
+      border-color: var(--color-fail);
+      color: #ff7b72;
     }
 
     /* Fault Cards Grid */
     .fault-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
-      gap: 14px;
+      gap: 12px;
       max-height: 440px;
       overflow-y: auto;
       padding-right: 4px;
     }
 
-    .fault-grid::-webkit-scrollbar {
-      width: 6px;
-    }
-
-    .fault-grid::-webkit-scrollbar-thumb {
-      background: #334155;
-      border-radius: 4px;
-    }
+    .fault-grid::-webkit-scrollbar { width: 6px; }
+    .fault-grid::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 4px; }
 
     .fault-card {
-      background: var(--dark-layer-elevated);
-      border: 1px solid #334155;
-      border-radius: 10px;
-      padding: 14px;
+      background: var(--card-inner);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 12px 14px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
       transition: all 0.2s ease;
       position: relative;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
     }
 
     .fault-card:hover {
-      border-color: #38bdf8;
+      border-color: rgba(56, 139, 253, 0.45);
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
     }
 
     .fault-card.risk-high {
-      border-left: 4px solid #ef4444;
+      border-left: 3px solid var(--color-fail);
     }
     .fault-card.risk-high:hover {
-      border-color: #f87171;
-      box-shadow: 0 6px 20px rgba(239, 68, 68, 0.3);
+      border-color: rgba(248, 81, 73, 0.6);
+      box-shadow: 0 4px 16px rgba(248, 81, 73, 0.2);
     }
 
     .fault-card.risk-medium {
-      border-left: 4px solid #f59e0b;
+      border-left: 3px solid var(--color-warn);
     }
 
     .fault-card.risk-low {
-      border-left: 4px solid #22c55e;
+      border-left: 3px solid var(--color-pass);
     }
 
     .fault-top {
@@ -559,9 +477,9 @@
     }
 
     .fault-name {
-      font-size: 13.5px;
-      font-weight: 800;
-      color: #ffffff;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-main);
       line-height: 1.3;
     }
 
@@ -573,50 +491,49 @@
 
     .badge-stage {
       font-size: 10px;
-      padding: 2px 7px;
+      padding: 2px 6px;
       border-radius: 4px;
-      background: #1e293b;
-      color: #94a3b8;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-muted);
       font-family: var(--font-mono);
-      font-weight: 700;
+      font-weight: 600;
       text-transform: uppercase;
-      border: 1px solid #334155;
     }
 
     .badge-risk-high {
       font-size: 10px;
-      padding: 2px 8px;
+      padding: 2px 7px;
       border-radius: 4px;
-      background: rgba(239, 68, 68, 0.2);
-      color: #fca5a5;
-      border: 1px solid #dc2626;
-      font-weight: 800;
+      background: rgba(248, 81, 73, 0.18);
+      color: #ff7b72;
+      border: 1px solid rgba(248, 81, 73, 0.4);
+      font-weight: 700;
       letter-spacing: 0.3px;
     }
 
     .badge-risk-med {
       font-size: 10px;
-      padding: 2px 8px;
+      padding: 2px 7px;
       border-radius: 4px;
-      background: rgba(245, 158, 11, 0.2);
-      color: #fde047;
-      border: 1px solid #d97706;
-      font-weight: 700;
+      background: rgba(227, 179, 65, 0.15);
+      color: #e3b341;
+      border: 1px solid rgba(227, 179, 65, 0.3);
+      font-weight: 600;
     }
 
     .badge-risk-low {
       font-size: 10px;
-      padding: 2px 8px;
+      padding: 2px 7px;
       border-radius: 4px;
-      background: rgba(34, 197, 94, 0.2);
-      color: #86efac;
-      border: 1px solid #16a34a;
-      font-weight: 700;
+      background: rgba(46, 160, 67, 0.15);
+      color: #7ee787;
+      border: 1px solid rgba(46, 160, 67, 0.3);
+      font-weight: 600;
     }
 
     .fault-desc {
       font-size: 12px;
-      color: #94a3b8;
+      color: var(--text-muted);
       line-height: 1.4;
       flex: 1;
     }
@@ -624,14 +541,13 @@
     .fault-target {
       font-family: var(--font-mono);
       font-size: 11px;
-      color: #38bdf8;
-      background: #0b1120;
+      color: #79c0ff;
+      background: rgba(0, 0, 0, 0.35);
       padding: 4px 8px;
-      border-radius: 6px;
+      border-radius: 4px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-      border: 1px solid #1e293b;
     }
 
     .fault-footer {
@@ -642,43 +558,43 @@
     }
 
     .btn-inject {
-      background: #0b1120;
-      color: #38bdf8;
-      border: 1px solid #0284c7;
-      border-radius: 6px;
-      padding: 5px 12px;
-      font-size: 12px;
-      font-weight: 700;
+      background: rgba(56, 139, 253, 0.15);
+      color: #79c0ff;
+      border: 1px solid rgba(56, 139, 253, 0.35);
+      border-radius: 5px;
+      padding: 4px 10px;
+      font-size: 11.5px;
+      font-weight: 600;
       cursor: pointer;
       transition: all 0.15s ease;
       display: inline-flex;
       align-items: center;
-      gap: 5px;
+      gap: 4px;
       font-family: var(--font-sans);
-      box-shadow: 0 2px 8px rgba(2, 132, 199, 0.25);
     }
 
     .btn-inject:hover {
-      background: #0284c7;
+      background: var(--accent-blue);
       color: white;
+      border-color: var(--accent-blue);
       transform: translateY(-1px);
-      box-shadow: 0 4px 14px rgba(2, 132, 199, 0.45);
+      box-shadow: 0 0 10px rgba(56, 139, 253, 0.4);
     }
 
     .btn-inject-risk {
-      background: #0b1120;
-      color: #f87171;
-      border-color: #dc2626;
-      box-shadow: 0 2px 8px rgba(220, 38, 38, 0.25);
+      background: rgba(248, 81, 73, 0.15);
+      color: #ff7b72;
+      border-color: rgba(248, 81, 73, 0.35);
     }
 
     .btn-inject-risk:hover {
-      background: #dc2626;
+      background: var(--color-fail);
       color: white;
-      box-shadow: 0 4px 14px rgba(220, 38, 38, 0.45);
+      border-color: var(--color-fail);
+      box-shadow: 0 0 10px rgba(248, 81, 73, 0.4);
     }
 
-    /* Pipeline Stage Strip (Crisp High-Contrast Nodes) */
+    /* Pipeline Stage Strip */
     .pipeline-strip {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -687,65 +603,54 @@
     }
 
     .stage-node {
-      background: rgba(248, 251, 255, 0.76);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border: 1.5px solid rgba(203, 224, 252, 0.85);
-      border-radius: 10px;
-      padding: 14px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 12px;
       text-align: center;
       transition: all 0.25s ease;
       position: relative;
-      box-shadow: 0 4px 10px rgba(15, 23, 42, 0.03);
     }
 
     .stage-node.passed {
-      border-color: #16a34a;
-      background: rgba(240, 253, 244, 0.85);
-      box-shadow: 0 4px 14px rgba(22, 163, 74, 0.18);
+      border-color: rgba(46, 160, 67, 0.5);
+      background: rgba(46, 160, 67, 0.1);
+      box-shadow: 0 0 14px rgba(46, 160, 67, 0.25);
     }
-    .stage-node.passed .stage-name { color: #166534; }
-    .stage-node.passed .stage-status { color: #15803d; font-weight: 700; }
 
     .stage-node.failed {
-      border-color: #dc2626;
-      background: rgba(254, 242, 242, 0.85);
-      box-shadow: 0 4px 16px rgba(220, 38, 38, 0.2);
+      border-color: rgba(248, 81, 73, 0.6);
+      background: rgba(248, 81, 73, 0.14);
+      box-shadow: 0 0 18px rgba(248, 81, 73, 0.35);
       animation: failGlow 1.8s infinite alternate;
     }
-    .stage-node.failed .stage-name { color: #991b1b; }
-    .stage-node.failed .stage-status { color: #b91c1c; font-weight: 700; }
 
     @keyframes failGlow {
-      from { border-color: rgba(220, 38, 38, 0.6); }
-      to { border-color: #dc2626; }
+      from { border-color: rgba(248, 81, 73, 0.5); }
+      to { border-color: rgba(248, 81, 73, 0.95); }
     }
 
     .stage-node.running {
-      border-color: #2563eb;
-      background: rgba(239, 246, 255, 0.85);
-      box-shadow: 0 4px 16px rgba(37, 99, 235, 0.2);
+      border-color: rgba(56, 139, 253, 0.6);
+      background: rgba(56, 139, 253, 0.12);
+      box-shadow: 0 0 16px rgba(56, 139, 253, 0.3);
       animation: stagePulse 1.2s infinite;
     }
-    .stage-node.running .stage-name { color: #1e40af; }
-    .stage-node.running .stage-status { color: #1d4ed8; font-weight: 700; }
 
     @keyframes stagePulse {
-      0%, 100% { border-color: rgba(37, 99, 235, 0.5); }
-      50% { border-color: #2563eb; }
+      0%, 100% { border-color: rgba(56, 139, 253, 0.4); }
+      50% { border-color: rgba(56, 139, 253, 0.9); }
     }
 
-    .stage-node.blocked,
-    .stage-node.pending {
-      opacity: 0.65;
+    .stage-node.blocked, .stage-node.pending {
+      opacity: 0.45;
     }
 
     .stage-name {
-      font-size: 13.5px;
-      font-weight: 800;
+      font-size: 13px;
+      font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      color: var(--text-main);
     }
 
     .stage-status {
@@ -763,23 +668,14 @@
     }
 
     .hypo-card {
-      background: rgba(255, 255, 255, 0.72);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(191, 219, 254, 0.65);
-      border-radius: 10px;
-      padding: 16px;
+      background: var(--card-bg);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 14px;
       display: flex;
       flex-direction: column;
       gap: 8px;
-      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
-      transition: all 0.2s ease;
-    }
-
-    .hypo-card:hover {
-      border-color: #60a5fa;
-      transform: translateY(-1px);
-      background: rgba(255, 255, 255, 0.85);
+      transition: border-color 0.2s;
     }
 
     .hypo-header {
@@ -790,84 +686,64 @@
 
     .hypo-id {
       font-family: var(--font-mono);
-      font-size: 12.5px;
-      font-weight: 800;
-      color: #0369a1;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent-cyan);
     }
 
     .hypo-stmt {
-      font-size: 14px;
-      line-height: 1.45;
-      font-weight: 700;
-      color: var(--text-main);
+      font-size: 13.5px;
+      line-height: 1.4;
+      font-weight: 500;
     }
 
     .hypo-experiment {
       font-family: var(--font-mono);
       font-size: 11.5px;
-      background: rgba(240, 249, 255, 0.85);
-      padding: 8px 12px;
+      background: rgba(0, 0, 0, 0.35);
+      padding: 6px 10px;
       border-radius: 6px;
-      color: #0369a1;
-      border: 1px solid rgba(186, 230, 253, 0.75);
-      border-left: 4px solid #0284c7;
+      color: #79c0ff;
+      border-left: 2px solid var(--accent-blue);
     }
 
     .hypo-evidence {
-      font-size: 12.5px;
-      color: #334155;
-      border-left: 3px solid rgba(148, 163, 184, 0.7);
-      padding-left: 10px;
+      font-size: 12px;
+      color: var(--text-muted);
+      border-left: 2px solid rgba(255, 255, 255, 0.15);
+      padding-left: 8px;
       margin-top: 2px;
-      font-weight: 500;
     }
 
     /* Verdict Badges */
     .verdict-badge {
       font-size: 11px;
-      padding: 3px 10px;
+      padding: 2px 8px;
       border-radius: 12px;
-      font-weight: 800;
+      font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.3px;
     }
+    .verdict-confirmed { background: rgba(46, 160, 67, 0.2); color: #3fb950; border: 1px solid #2ea043; }
+    .verdict-rejected { background: rgba(248, 81, 73, 0.2); color: #f85149; border: 1px solid #f85149; }
+    .verdict-symptom_only { background: rgba(227, 179, 65, 0.2); color: #e3b341; border: 1px solid #e3b341; }
+    .verdict-inconclusive { background: rgba(139, 148, 158, 0.2); color: #8b949e; border: 1px solid #8b949e; }
 
-    .verdict-confirmed {
-      background: #dcfce7;
-      color: #15803d;
-      border: 1px solid #86efac;
-    }
-
-    .verdict-rejected {
-      background: #fee2e2;
-      color: #b91c1c;
-      border: 1px solid #fca5a5;
-    }
-
-    .verdict-symptom_only {
-      background: #fef3c7;
-      color: #b45309;
-      border: 1px solid #fcd34d;
-    }
-
-    .verdict-inconclusive {
-      background: #f1f5f9;
-      color: #475569;
-      border: 1px solid #cbd5e1;
-    }
-
-    /* Human Approval Banner (Dark Floating Action Layer) */
+    /* Human Approval Banner */
     .approval-modal {
-      background: var(--dark-layer);
-      border: 1.5px solid #d97706;
-      border-radius: 12px;
-      padding: 20px 24px;
+      background: linear-gradient(135deg, rgba(227, 179, 65, 0.15), rgba(248, 81, 73, 0.12));
+      border: 1px solid var(--color-warn);
+      border-radius: 10px;
+      padding: 18px 22px;
       display: flex;
       flex-direction: column;
       gap: 14px;
-      box-shadow: 0 12px 30px rgba(217, 119, 6, 0.25);
+      box-shadow: 0 0 28px rgba(227, 179, 65, 0.25);
       animation: alertPulse 2s infinite ease-in-out;
-      color: #f8fafc;
+    }
+
+    @keyframes alertPulse {
+      0%, 100% { border-color: rgba(227, 179, 65, 0.6); }
+      50% { border-color: rgba(227, 179, 65, 1); }
     }
 
     .approval-top {
@@ -878,8 +754,8 @@
 
     .approval-title {
       font-size: 14px;
-      font-weight: 800;
-      color: #fbbf24;
+      font-weight: 700;
+      color: var(--color-warn);
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
@@ -887,13 +763,12 @@
     .approval-diff {
       font-family: var(--font-mono);
       font-size: 12px;
-      background: #131d33;
-      padding: 12px 16px;
-      border-radius: 8px;
-      color: #f8fafc;
+      background: rgba(0, 0, 0, 0.45);
+      padding: 12px 14px;
+      border-radius: 6px;
+      color: #f0f6fc;
       overflow-x: auto;
       line-height: 1.5;
-      border: 1px solid #334155;
     }
 
     .approval-actions {
@@ -901,13 +776,13 @@
       gap: 12px;
     }
 
-    /* Buttons (Dark Surface with Deep Pop Shadows) */
+    /* Buttons */
     .btn {
       font-family: var(--font-sans);
       font-size: 13px;
-      font-weight: 700;
-      padding: 9px 18px;
-      border-radius: 8px;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: 6px;
       border: none;
       cursor: pointer;
       display: inline-flex;
@@ -916,56 +791,16 @@
       transition: all 0.2s ease;
     }
 
-    .btn:hover {
-      transform: translateY(-2px);
-      filter: brightness(1.1);
-    }
+    .btn:hover { transform: translateY(-1px); filter: brightness(1.1); }
+    .btn:active { transform: translateY(0); }
 
-    .btn:active {
-      transform: translateY(0);
-    }
+    .btn-primary { background: linear-gradient(135deg, #1f6feb, #388bfd); color: white; box-shadow: 0 0 12px rgba(56, 139, 253, 0.3); }
+    .btn-danger { background: linear-gradient(135deg, #da3633, #f85149); color: white; }
+    .btn-approve { background: linear-gradient(135deg, #238636, #2ea043); color: white; }
+    .btn-reject { background: linear-gradient(135deg, #da3633, #f85149); color: white; }
+    .btn-secondary { background: rgba(255, 255, 255, 0.08); color: var(--text-main); border: 1px solid var(--border-subtle); }
 
-    .btn-primary {
-      background: var(--dark-layer);
-      color: #ffffff;
-      border: 1px solid #1e293b;
-      box-shadow: var(--shadow-btn);
-    }
-    .btn-primary:hover {
-      background: #1e293b;
-      box-shadow: var(--shadow-btn-hover);
-    }
-
-    .btn-secondary {
-      background: #1e293b;
-      color: #ffffff;
-      border: 1px solid #334155;
-      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2);
-    }
-    .btn-secondary:hover {
-      background: #334155;
-      box-shadow: 0 6px 16px rgba(15, 23, 42, 0.3);
-    }
-
-    .btn-danger {
-      background: #dc2626;
-      color: white;
-      box-shadow: 0 4px 14px rgba(220, 38, 38, 0.35);
-    }
-
-    .btn-approve {
-      background: #15803d;
-      color: white;
-      box-shadow: 0 4px 14px rgba(22, 163, 74, 0.35);
-    }
-
-    .btn-reject {
-      background: #dc2626;
-      color: white;
-      box-shadow: 0 4px 14px rgba(220, 38, 38, 0.35);
-    }
-
-    /* Timeline (Crisp White Card with Dark Contrast Text) */
+    /* Timeline */
     .timeline-container {
       max-height: 420px;
       overflow-y: auto;
@@ -975,102 +810,188 @@
       padding-right: 4px;
     }
 
-    .timeline-container::-webkit-scrollbar {
-      width: 6px;
-    }
-
-    .timeline-container::-webkit-scrollbar-thumb {
-      background: #cbd5e1;
-      border-radius: 4px;
-    }
+    .timeline-container::-webkit-scrollbar { width: 6px; }
+    .timeline-container::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 4px; }
 
     .timeline-item {
       display: flex;
       gap: 12px;
-      font-size: 13px;
-      padding: 9px 14px;
-      background: rgba(248, 251, 255, 0.72);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      border: 1px solid rgba(219, 234, 254, 0.65);
-      border-radius: 8px;
-      border-left: 4px solid var(--border-subtle);
+      font-size: 12.5px;
+      padding: 8px 12px;
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: 6px;
+      border-left: 3px solid var(--border-subtle);
     }
 
-    .timeline-item.alert { border-left-color: #dc2626; background: rgba(254, 242, 242, 0.75); }
-    .timeline-item.triage { border-left-color: #0284c7; background: rgba(240, 249, 255, 0.75); }
-    .timeline-item.hypotheses { border-left-color: #7c3aed; background: rgba(250, 245, 255, 0.75); }
-    .timeline-item.experiment { border-left-color: #2563eb; background: rgba(239, 246, 255, 0.75); }
-    .timeline-item.verdicts { border-left-color: #d97706; background: rgba(255, 251, 235, 0.75); }
-    .timeline-item.apply { border-left-color: #2563eb; background: rgba(239, 246, 255, 0.75); }
-    .timeline-item.verify { border-left-color: #16a34a; background: rgba(240, 253, 244, 0.75); }
-    .timeline-item.resolved { border-left-color: #16a34a; background: rgba(240, 253, 244, 0.75); }
-    .timeline-item.escalated { border-left-color: #dc2626; background: rgba(254, 242, 242, 0.75); }
+    .timeline-item.alert { border-left-color: var(--color-fail); }
+    .timeline-item.triage { border-left-color: var(--accent-cyan); }
+    .timeline-item.hypotheses { border-left-color: var(--color-purple); }
+    .timeline-item.experiment { border-left-color: var(--accent-blue); }
+    .timeline-item.verdicts { border-left-color: var(--color-warn); }
+    .timeline-item.apply { border-left-color: var(--accent-blue); }
+    .timeline-item.verify { border-left-color: #56d364; }
+    .timeline-item.resolved { border-left-color: var(--color-pass); background: rgba(46, 160, 67, 0.1); }
+    .timeline-item.escalated { border-left-color: var(--color-fail); background: rgba(248, 81, 73, 0.1); }
 
     .item-kind {
       font-family: var(--font-mono);
-      font-weight: 800;
+      font-weight: 700;
       color: var(--text-main);
-      min-width: 90px;
+      min-width: 85px;
       text-transform: uppercase;
-      font-size: 11.5px;
+      font-size: 11px;
     }
 
     .item-payload {
-      color: #334155;
+      color: var(--text-muted);
       word-break: break-all;
-      font-weight: 500;
     }
 
-    /* Benchmarking & Handoff Table (Frosted Half-White Contrast) */
+    /* Benchmarking & Handoff Table */
     .bench-table {
       width: 100%;
       border-collapse: collapse;
       font-size: 13px;
     }
 
-    .bench-table th,
-    .bench-table td {
-      padding: 11px 14px;
+    .bench-table th, .bench-table td {
+      padding: 10px 14px;
       text-align: left;
-      border-bottom: 1px solid rgba(226, 238, 254, 0.75);
-      color: var(--text-main);
+      border-bottom: 1px solid var(--border-subtle);
     }
 
     .bench-table th {
-      color: #475569;
-      font-weight: 800;
+      color: var(--text-muted);
+      font-weight: 600;
       text-transform: uppercase;
       font-size: 11px;
-      letter-spacing: 0.6px;
-      background: rgba(239, 246, 255, 0.7);
+      letter-spacing: 0.5px;
     }
 
     .bench-highlight {
-      font-weight: 800;
-      color: #15803d;
+      font-weight: 700;
+      color: var(--color-pass);
     }
 
     .handoff-box {
       font-family: var(--font-mono);
       font-size: 12px;
-      background: var(--dark-layer);
-      padding: 16px;
-      border-radius: 10px;
-      color: #f8fafc;
+      background: rgba(0, 0, 0, 0.45);
+      padding: 14px;
+      border-radius: 8px;
+      color: #e6edf3;
       white-space: pre-wrap;
-      line-height: 1.5;
+      line-height: 1.45;
       max-height: 300px;
       overflow-y: auto;
-      border: 1px solid #1e293b;
-      box-shadow: 0 4px 14px rgba(11, 17, 32, 0.2);
     }
+
+    /* GitHub Actions Run Strip */
+    .github-strip {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 18px;
+      background: rgba(13, 17, 23, 0.85);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      margin-bottom: 14px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      flex-wrap: wrap;
+    }
+
+    .github-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      font-size: 12px;
+    }
+
+    .github-pill.failed {
+      background: rgba(248, 81, 73, 0.15);
+      color: #ff7b72;
+      border: 1px solid rgba(248, 81, 73, 0.4);
+    }
+
+    .github-pill.failed:hover {
+      background: rgba(248, 81, 73, 0.25);
+    }
+
+    .github-pill.rehearsal {
+      background: rgba(56, 139, 253, 0.15);
+      color: #79c0ff;
+      border: 1px solid rgba(56, 139, 253, 0.4);
+    }
+
+    .github-pill.rehearsal:hover {
+      background: rgba(56, 139, 253, 0.25);
+    }
+
+    .github-pill.passed {
+      background: rgba(46, 160, 67, 0.15);
+      color: #7ee787;
+      border: 1px solid rgba(46, 160, 67, 0.4);
+    }
+
+    .github-pill.passed:hover {
+      background: rgba(46, 160, 67, 0.25);
+    }
+
+    .github-arrow {
+      color: var(--text-dim);
+      font-size: 14px;
+    }
+
+    /* Diff Viewer */
+    .diff-viewer {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      background: #0d1117;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 6px;
+      padding: 12px;
+      max-height: 220px;
+      overflow-y: auto;
+      line-height: 1.45;
+      white-space: pre-wrap;
+    }
+
+    .diff-line-add { color: #7ee787; background: rgba(46, 160, 67, 0.15); display: block; border-left: 3px solid #2ea043; padding-left: 6px; }
+    .diff-line-del { color: #ff7b72; background: rgba(248, 81, 73, 0.15); display: block; border-left: 3px solid #f85149; padding-left: 6px; }
+    .diff-line-ctx { color: #8b949e; display: block; padding-left: 9px; }
+
+    /* Breakdown Bar */
+    .breakdown-bar {
+      display: flex;
+      height: 16px;
+      border-radius: 8px;
+      overflow: hidden;
+      margin: 10px 0;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .bb-segment {
+      height: 100%;
+      transition: width 0.3s ease;
+    }
+
+    .bb-detect { background: #388bfd; }
+    .bb-diag { background: #a371f7; }
+    .bb-fix { background: #39c5bb; }
+    .bb-rehearsal { background: #e3b341; }
+    .bb-approval { background: #f85149; }
+    .bb-merge { background: #2ea043; }
   </style>
 </head>
-
 <body>
 
-  <!-- Top Navigation (Dark Pop Upper Layer) -->
+  <!-- Top Navigation -->
   <header>
     <div class="brand">
       <div class="brand-logo">&#x2694;</div>
@@ -1081,50 +1002,66 @@
     </div>
     <div class="header-meta">
       <div id="status-badge" class="badge badge-running">STANDBY</div>
-      <div id="incident-timer" style="font-family: var(--font-mono); font-size: 13px; color: #94a3b8; font-weight: 600;">0.0s</div>
+      <div id="incident-timer" style="font-family: var(--font-mono); font-size: 13px; color: var(--text-muted);">0.0s</div>
     </div>
   </header>
 
-  <!-- Chaos Engineering Control Panel & Live Pipeline Strip (Pure White Contrast Card) -->
+  <!-- GitHub Lifecycle Run Strip -->
+  <div class="github-strip" id="github-run-strip" style="display: none;">
+    <span style="color: var(--text-muted); font-size: 11.5px; text-transform: uppercase; font-weight: 700;">GitHub CI/CD Lifecycle:</span>
+    <a id="gh-failed-run" class="github-pill failed" href="#" target="_blank">&#x274C; Failed Run #--</a>
+    <span class="github-arrow">&rarr;</span>
+    <a id="gh-pr-link" class="github-pill rehearsal" href="#" target="_blank">&#x23F3; PR #-- CI Rehearsal</a>
+    <span class="github-arrow">&rarr;</span>
+    <a id="gh-main-run" class="github-pill passed" href="#" target="_blank">&#x2705; main Recovered Green</a>
+  </div>
+
+  <!-- Chaos Engineering Control Panel & Live Pipeline Strip -->
   <div class="card">
     <div class="chaos-container">
-
+      
       <!-- Top Action Bar: Pitch Presets & Quick Controls -->
       <div class="chaos-header-bar">
         <div>
           <div class="card-title">&#x26A1; Chaos Control Center &amp; Fault Injection Panel</div>
-          <div style="font-size: 12px; color: var(--text-muted); margin-top: 3px; font-weight: 500;">
-            Inject realistic CI/CD faults into the sandbox to evaluate Lazarus autonomous triage, deterministic risk
-            gate, and verifier.
+          <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 2px;">
+            Inject realistic CI/CD faults into the sandbox to evaluate Lazarus autonomous triage, deterministic risk gate, and verifier.
           </div>
         </div>
 
         <div class="chaos-actions">
-          <!-- Live Demo Presets for 5-Min Hackathon Pitch (Dark Upper Layer with Pop Shadows) -->
+          <!-- Live Demo Presets for 5-Min Hackathon Pitch -->
           <div class="demo-preset-group">
-            <span class="preset-label">&#x1F3AF; Pitch Presets:</span>
-            <button class="btn-preset auto-heal" onclick="startIncident('dependency_conflict')"
-              title="Runs end-to-end autonomous triage, hypotheses, and verification with low-risk fix">&#x26A1;
-              Auto-Heal</button>
-            <button class="btn-preset risk-gate" onclick="startIncident('secret_exposure')"
-              title="Injects exposed API secret, forces deterministic Risk Gate pause for human approval">&#x1F6E1;&#xFE0F;
-              Risk Gate</button>
-            <button class="btn-preset cascade" onclick="startIncident('procedural')"
-              title="Procedural cascading multi-fault scenario where fix reveals downstream failure">&#x1F30A;
-              Cascade</button>
-            <button class="btn-preset escalate" onclick="startIncident('bad_migration_sql')"
-              title="Triggers verification retry limit and generates human SRE handoff report">&#x1F6A8;
-              Escalate</button>
+            <span class="preset-label">&#x1F3AF; Sandbox Presets:</span>
+            <button class="btn-preset auto-heal" onclick="startIncident('dependency_conflict')" title="Runs end-to-end autonomous triage, hypotheses, and verification with low-risk fix">&#x26A1; Auto-Heal</button>
+            <button class="btn-preset risk-gate" onclick="startIncident('secret_exposure')" title="Injects exposed API secret, forces deterministic Risk Gate pause for human approval">&#x1F6E1;&#xFE0F; Risk Gate</button>
+            <button class="btn-preset cascade" onclick="startIncident('procedural')" title="Procedural cascading multi-fault scenario where fix reveals downstream failure">&#x1F30A; Cascade</button>
+            <button class="btn-preset escalate" onclick="startIncident('bad_migration_sql')" title="Triggers verification retry limit and generates human SRE handoff report">&#x1F6A8; Escalate</button>
           </div>
 
-          <!-- Quick Actions (Dark Pop Buttons with Rich Shadows) -->
-          <button class="btn btn-primary" id="btn-quick-break" onclick="startIncident()">&#x26A1; Break Pipeline</button>
-          <button class="btn btn-secondary" id="btn-toggle-drawer" onclick="toggleChaosDrawer()">&#x1F5C3;&#xFE0F; Fault Catalog (20)</button>
+          <!-- Quick Actions -->
+          <button class="btn btn-primary" id="btn-quick-break" onclick="startIncident()">&#x26A1; Break Sandbox</button>
+          <button class="btn btn-secondary" id="btn-toggle-drawer" onclick="toggleChaosDrawer()">&#x1F5C3;&#xFE0F; Catalog (20)</button>
           <button class="btn btn-secondary" onclick="runBenchmark()">&#x1F4CA; Benchmark (6x)</button>
         </div>
       </div>
 
-      <!-- Active Chaos Status Banner (Floating Dark Alert Bar) -->
+      <!-- Real GitHub Repo Chaos Injection Bar -->
+      <div style="margin-top: 12px; padding: 10px 16px; background: rgba(56, 139, 253, 0.08); border: 1px solid rgba(56, 139, 253, 0.25); border-radius: 8px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px;">
+        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+          <span style="font-weight: 700; font-size: 12px; color: #79c0ff; display: inline-flex; align-items: center; gap: 4px;">
+            &#x1F419; GitHub Actions Fault Injection:
+          </span>
+          <button class="btn-preset auto-heal" onclick="injectGithubFault('deps')" title="Pins requests==99.0.0; auto-heals">&#x1F4E6; Deps Pin</button>
+          <button class="btn-preset auto-heal" onclick="injectGithubFault('regression')" title="Alters pricing percentage logic; auto-heals">&#x1F9EE; Logic Bug</button>
+          <button class="btn-preset auto-heal" onclick="injectGithubFault('dockerfile')" title="Typo requirments.txt; auto-heals">&#x1F433; Dockerfile Typo</button>
+          <button class="btn-preset risk-gate" onclick="injectGithubFault('pyversion')" title="Sets Python 3.6 in CI workflow; stops for Human Risk Gate approval">&#x1F6E1;&#xFE0F; Python 3.6 (Gate)</button>
+          <button class="btn-preset escalate" onclick="injectGithubFault('secret')" title="Adds test expecting PAYMENT_API_KEY secret; escalates safely">&#x1F6A8; Secret (Escalate)</button>
+        </div>
+        <button class="btn btn-secondary" style="font-size: 11.5px; padding: 4px 12px;" onclick="injectGithubFault('reset')">&#x1F504; Reset Demo Repo</button>
+      </div>
+
+      <!-- Active Chaos Status Banner -->
       <div id="active-chaos-banner" class="active-chaos-banner">
         <div class="active-chaos-info">
           <div class="active-chaos-title">&#x26A0;&#xFE0F; <span id="active-fault-name">Chaos Injected</span></div>
@@ -1136,13 +1073,12 @@
         </div>
       </div>
 
-      <!-- Expandable 20-Fault Chaos Matrix Drawer (Dark Pop Upper Layer) -->
+      <!-- Expandable 20-Fault Chaos Matrix Drawer -->
       <div id="chaos-drawer" class="chaos-drawer">
         <div class="drawer-controls">
           <div class="search-box">
-            <span style="color: #94a3b8; font-size: 13px;">&#x1F50D;</span>
-            <input type="text" id="chaos-search" class="search-input"
-              placeholder="Search 20 faults (e.g., secret, terraform, docker, sql)..." oninput="filterFaults()">
+            <span style="color: var(--text-muted); font-size: 13px;">&#x1F50D;</span>
+            <input type="text" id="chaos-search" class="search-input" placeholder="Search 20 faults (e.g., secret, terraform, docker, sql)..." oninput="filterFaults()">
           </div>
 
           <div class="category-tabs">
@@ -1183,20 +1119,20 @@
     </div>
   </div>
 
-  <!-- Human Approval Modal (Dynamic Dark Upper Layer) -->
+  <!-- Human Approval Modal (Dynamic) -->
   <div id="approval-section" style="display: none;"></div>
 
-  <!-- Main Split Grid (Crisp White Surfaces with Bright Black Text) -->
+  <!-- Main Split Grid -->
   <div class="dashboard-grid">
-
+    
     <!-- Left Column: Hypothesis Board -->
     <div class="card">
       <div class="card-header">
         <div class="card-title">&#x1F9E0; Hypothesis-Driven Investigation Board</div>
-        <span id="cycle-badge" class="badge" style="background: #f1f5f9; color: var(--text-main); border: 1px solid #cbd5e1;">Cycle 1/3</span>
+        <span id="cycle-badge" class="badge" style="background: rgba(255,255,255,0.06); color: var(--text-muted);">Cycle 1/3</span>
       </div>
       <div id="hypothesis-container" class="hypo-grid">
-        <div style="color: var(--text-dim); font-size: 13px; text-align: center; padding: 32px 0; font-weight: 500;">
+        <div style="color: var(--text-dim); font-size: 13px; text-align: center; padding: 32px 0;">
           Awaiting pipeline failure event to trigger triage and hypothesis formulation...
         </div>
       </div>
@@ -1206,10 +1142,10 @@
     <div class="card">
       <div class="card-header">
         <div class="card-title">&#x1F4E1; Autonomous SRE Timeline</div>
-        <span id="event-count" style="font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); font-weight: 600;">0 events</span>
+        <span id="event-count" style="font-family: var(--font-mono); font-size: 12px; color: var(--text-muted);">0 events</span>
       </div>
       <div id="timeline-container" class="timeline-container">
-        <div style="color: var(--text-dim); font-size: 13px; text-align: center; padding: 32px 0; font-weight: 500;">
+        <div style="color: var(--text-dim); font-size: 13px; text-align: center; padding: 32px 0;">
           Timeline idle. No active incident running.
         </div>
       </div>
@@ -1219,7 +1155,7 @@
 
   <!-- Bottom Grid: Benchmark & Escalation Handoff -->
   <div class="dashboard-grid">
-
+    
     <!-- Benchmark Comparison -->
     <div class="card">
       <div class="card-header">
@@ -1238,19 +1174,19 @@
         </thead>
         <tbody id="bench-body">
           <tr>
-            <td><strong style="color: #0284c7;">Lazarus-CI</strong></td>
+            <td><strong style="color: #58a6ff;">Lazarus-CI</strong></td>
             <td id="laz-n">-</td>
             <td id="laz-res" class="bench-highlight">-</td>
             <td id="laz-steps">-</td>
-            <td id="laz-destr" style="color: var(--color-pass); font-weight: 800;">0.0</td>
+            <td id="laz-destr" style="color: var(--color-pass); font-weight: 700;">0.0</td>
             <td id="laz-score" class="bench-highlight">-</td>
           </tr>
           <tr>
-            <td><span style="color: var(--text-muted); font-weight: 600;">Naive "Chat with Logs"</span></td>
+            <td><span style="color: var(--text-muted);">Naive "Chat with Logs"</span></td>
             <td id="naive-n">-</td>
             <td id="naive-res">-</td>
             <td id="naive-steps">-</td>
-            <td id="naive-destr" style="color: var(--color-fail); font-weight: 700;">-</td>
+            <td id="naive-destr" style="color: var(--color-fail);">-</td>
             <td id="naive-score">-</td>
           </tr>
         </tbody>
@@ -1263,12 +1199,47 @@
         <div class="card-title">&#x1F4CB; SRE Handoff Report / Verdict</div>
       </div>
       <div id="handoff-content">
-        <div style="color: var(--text-dim); font-size: 13px; text-align: center; padding: 24px 0; font-weight: 500;">
+        <div style="color: var(--text-dim); font-size: 13px; text-align: center; padding: 24px 0;">
           No escalation handoff generated. Pipeline operating under autonomous control.
         </div>
       </div>
+  <!-- Insights & Diff Grid -->
+  <div class="dashboard-grid">
+    <!-- Time Breakdown & MTTR -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">&#x23F1;&#xFE0F; Where the Time Went (MTTR Breakdown)</div>
+        <span id="mttr-badge" class="badge" style="background: rgba(46,160,67,0.15); color: #7ee787;">MTTR: --</span>
+      </div>
+      <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">
+        Real lifecycle timestamps measured across detection, diagnosis, rehearsal, and merge.
+      </div>
+      <div class="breakdown-bar" id="breakdown-bar">
+        <div class="bb-segment bb-detect" style="width: 15%;" title="Detect"></div>
+        <div class="bb-segment bb-diag" style="width: 25%;" title="Diagnose"></div>
+        <div class="bb-segment bb-fix" style="width: 15%;" title="Author Fix"></div>
+        <div class="bb-segment bb-rehearsal" style="width: 30%;" title="CI Rehearsal"></div>
+        <div class="bb-segment bb-merge" style="width: 15%;" title="Merge to Green"></div>
+      </div>
+      <div style="display: flex; justify-content: space-between; font-size: 11px; font-family: var(--font-mono); color: var(--text-muted); flex-wrap: wrap; gap: 8px; margin-top: 6px;">
+        <span><span style="color:#388bfd;">■</span> Detect: <strong id="time-detect">-</strong></span>
+        <span><span style="color:#a371f7;">■</span> Diagnose: <strong id="time-diag">-</strong></span>
+        <span><span style="color:#39c5bb;">■</span> Author: <strong id="time-author">-</strong></span>
+        <span><span style="color:#e3b341;">■</span> Rehearsal: <strong id="time-rehearsal">-</strong></span>
+        <span><span style="color:#2ea043;">■</span> Merge: <strong id="time-merge">-</strong></span>
+      </div>
     </div>
 
+    <!-- Candidate Fix Diff Viewer -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">&#x1F504; Candidate Fix Unified Diff</div>
+        <span id="diff-file-badge" class="badge" style="background: rgba(255,255,255,0.06); color: var(--text-muted);">No commit yet</span>
+      </div>
+      <div id="diff-viewer" class="diff-viewer">
+        <span style="color: var(--text-dim);">Awaiting autonomous fix generation...</span>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -1501,8 +1472,8 @@
       tabs.forEach(t => {
         const el = document.getElementById(`tab-${t}`);
         if (el) {
-          el.className = (t === cat)
-            ? (t === "security" ? "cat-tab active-risk" : "cat-tab active")
+          el.className = (t === cat) 
+            ? (t === "security" ? "cat-tab active-risk" : "cat-tab active") 
             : "cat-tab";
         }
       });
@@ -1514,10 +1485,10 @@
       const query = (document.getElementById("chaos-search")?.value || "").toLowerCase().trim();
       const filtered = CHAOS_CATALOG.filter(f => {
         const matchCat = (selectedCategory === "all") || (f.category === selectedCategory);
-        const matchQuery = !query ||
-          f.name.toLowerCase().includes(query) ||
-          f.id.toLowerCase().includes(query) ||
-          f.target.toLowerCase().includes(query) ||
+        const matchQuery = !query || 
+          f.name.toLowerCase().includes(query) || 
+          f.id.toLowerCase().includes(query) || 
+          f.target.toLowerCase().includes(query) || 
           f.description.toLowerCase().includes(query);
         return matchCat && matchQuery;
       });
@@ -1533,7 +1504,7 @@
       const grid = document.getElementById("fault-grid");
       if (!grid) return;
       if (items.length === 0) {
-        grid.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; color: var(--text-on-dark-muted); padding: 24px; font-weight: 500;">No chaos faults match your filter query.</div>`;
+        grid.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; color: var(--text-dim); padding: 24px;">No chaos faults match your filter query.</div>`;
         return;
       }
 
@@ -1554,7 +1525,7 @@
             <div class="fault-target">&#x1F4C1; ${f.target}</div>
             <div class="fault-desc">${f.description}</div>
             <div class="fault-footer">
-              <span style="font-family: var(--font-mono); font-size: 11px; color: #64748b;">${f.id}</span>
+              <span style="font-family: var(--font-mono); font-size: 11px; color: var(--text-dim);">${f.id}</span>
               <button class="${btnClass}" onclick="startIncident('${f.id}')">
                 &#x26A1; Inject Fault
               </button>
@@ -1568,7 +1539,7 @@
     function showActiveChaos(faultId) {
       const banner = document.getElementById("active-chaos-banner");
       if (!banner) return;
-
+      
       const f = CHAOS_CATALOG.find(item => item.id === faultId);
       if (f) {
         banner.style.display = "flex";
@@ -1651,7 +1622,7 @@
         const el = document.getElementById(`stage-${s}`);
         const statusEl = document.getElementById(`status-${s}`);
         const status = (stages && stages[s]) ? stages[s].toLowerCase() : "pending";
-
+        
         el.className = `stage-node ${status}`;
         statusEl.textContent = status.toUpperCase();
       });
@@ -1704,7 +1675,7 @@
               <div class="approval-title">&#x26A0;&#xFE0F; SRE Risk Gate: Human Approval Required</div>
               <span class="badge badge-awaiting">AWAITING VERDICT</span>
             </div>
-            <div style="font-size: 13.5px; color: #f8fafc; font-weight: 500;">
+            <div style="font-size: 13px; color: var(--text-main);">
               <strong>Risk Assessment:</strong> ${reasons || "Modification touches protected service configuration"}<br>
               <strong>Suspected Root Cause:</strong> ${inc.approval.root_cause || "Configuration drift"}
             </div>
@@ -1770,23 +1741,122 @@
       const container = document.getElementById("handoff-content");
       if (inc && inc.handoff) {
         container.innerHTML = `
-          <div style="margin-bottom: 10px;">
+          <div style="margin-bottom: 8px;">
             <span class="badge badge-failed">&#x1F6A8; INCIDENT ESCALATED TO ON-CALL HUMAN</span>
           </div>
           <div class="handoff-box">${JSON.stringify(inc.handoff, null, 2)}</div>
         `;
       } else if (inc && inc.status === "resolved") {
         container.innerHTML = `
-          <div style="background: #f0fdf4; border: 1.5px solid #16a34a; padding: 18px; border-radius: 10px; box-shadow: 0 4px 14px rgba(22, 163, 74, 0.15);">
-            <div style="font-weight: 800; color: #15803d; font-size: 14.5px; margin-bottom: 4px;">
+          <div style="background: rgba(46,160,67,0.12); border: 1px solid var(--color-pass); padding: 16px; border-radius: 8px;">
+            <div style="font-weight: 700; color: var(--color-pass); font-size: 14px; margin-bottom: 4px;">
               &#x2705; INCIDENT AUTONOMOUSLY RESOLVED &amp; VERIFIED
             </div>
-            <div style="font-size: 13px; color: #166534; font-weight: 500;">
+            <div style="font-size: 13px; color: var(--text-muted);">
               All pipeline stages restored to green status. Verification executed independently with zero regressions.
             </div>
           </div>
         `;
       }
+    }
+
+    function escapeHtml(str) {
+      return (str || "").replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    async function injectGithubFault(name) {
+      try {
+        const res = await fetch(`${API_BASE}/chaos/${name}`, { method: 'POST' });
+        const data = await res.json();
+        const msg = data.message || `Action ${name} executed successfully.`;
+        const banner = document.getElementById("active-chaos-banner");
+        if (banner) {
+          banner.style.display = "flex";
+          document.getElementById("active-fault-name").textContent = `GitHub Chaos: ${name.toUpperCase()}`;
+          document.getElementById("active-fault-meta").textContent = msg;
+        }
+      } catch (err) {
+        alert(`Failed to trigger GitHub action: ${err}`);
+      }
+    }
+
+    function renderDiff(events) {
+      const fixEv = [...events].reverse().find(e => e.kind === 'fix_committed');
+      const viewer = document.getElementById('diff-viewer');
+      const badge = document.getElementById('diff-file-badge');
+      if (!viewer || !badge) return;
+
+      if (fixEv && fixEv.payload && fixEv.payload.diff) {
+        badge.textContent = fixEv.payload.file || 'Modified';
+        badge.style.color = '#79c0ff';
+        const lines = fixEv.payload.diff.split('\n');
+        viewer.innerHTML = lines.map(line => {
+          if (line.startsWith('+') && !line.startsWith('+++')) return `<span class="diff-line-add">${escapeHtml(line)}</span>`;
+          if (line.startsWith('-') && !line.startsWith('---')) return `<span class="diff-line-del">${escapeHtml(line)}</span>`;
+          return `<span class="diff-line-ctx">${escapeHtml(line)}</span>`;
+        }).join('');
+      } else {
+        viewer.innerHTML = `<span style="color: var(--text-dim);">Awaiting autonomous fix generation...</span>`;
+      }
+    }
+
+    function renderGithubRunStrip(events) {
+      const strip = document.getElementById('github-run-strip');
+      const failedLink = document.getElementById('gh-failed-run');
+      const prLink = document.getElementById('gh-pr-link');
+      const mainLink = document.getElementById('gh-main-run');
+      if (!strip || !failedLink) return;
+
+      const alertEv = events.find(e => e.kind === 'alert');
+      const prEv = [...events].reverse().find(e => e.kind === 'pr_opened');
+      const resEv = [...events].reverse().find(e => e.kind === 'resolved');
+
+      if (alertEv && alertEv.payload && alertEv.payload.run_url) {
+        strip.style.display = 'flex';
+        failedLink.href = alertEv.payload.run_url;
+        failedLink.textContent = `✖ Failed Run (GitHub)`;
+
+        if (prEv && prEv.payload && prEv.payload.url) {
+          prLink.href = prEv.payload.url;
+          prLink.textContent = `🔍 PR #${prEv.payload.pr} Rehearsal`;
+          prLink.style.display = 'inline-flex';
+        } else {
+          prLink.style.display = 'none';
+        }
+
+        if (resEv && resEv.payload && resEv.payload.run_url) {
+          mainLink.href = resEv.payload.run_url;
+          mainLink.textContent = `✔ main Recovered Green`;
+          mainLink.style.display = 'inline-flex';
+        } else {
+          mainLink.style.display = 'none';
+        }
+      }
+    }
+
+    async function fetchInsights() {
+      try {
+        const res = await fetch(`${API_BASE}/api/insights`);
+        const data = await res.json();
+        const inc = data.incident;
+        if (inc) {
+          const mttrBadge = document.getElementById('mttr-badge');
+          if (mttrBadge && inc.mttr_s) {
+            mttrBadge.textContent = `MTTR: ${inc.mttr_s}s`;
+          }
+          const b = inc.breakdown_s || {};
+          const elDetect = document.getElementById('time-detect');
+          const elDiag = document.getElementById('time-diag');
+          const elAuthor = document.getElementById('time-author');
+          const elRehearsal = document.getElementById('time-rehearsal');
+          const elMerge = document.getElementById('time-merge');
+          if (elDetect) elDetect.textContent = `${b.detect || 0}s`;
+          if (elDiag) elDiag.textContent = `${b.diagnose || 0}s`;
+          if (elAuthor) elAuthor.textContent = `${b.author_fix || 0}s`;
+          if (elRehearsal) elRehearsal.textContent = `${b.ci_rehearsal || 0}s`;
+          if (elMerge) elMerge.textContent = `${b.merge_to_green || 0}s`;
+        }
+      } catch (_) {}
     }
 
     async function pollState() {
@@ -1816,7 +1886,7 @@
             const banner = document.getElementById("active-chaos-banner");
             if (banner) {
               banner.style.display = "flex";
-              banner.style.borderColor = "#16a34a";
+              banner.style.borderColor = "var(--color-pass)";
               document.getElementById("active-fault-name").textContent = "All Pipeline Faults Remediated";
               document.getElementById("active-fault-meta").textContent = "Independent verifier passed";
               const riskEl = document.getElementById("active-fault-risk");
@@ -1829,6 +1899,9 @@
         renderHypotheses(events);
         renderTimeline(events);
         renderBench(data.bench);
+        renderDiff(events);
+        renderGithubRunStrip(events);
+        fetchInsights();
       } catch (err) {
         console.error("Polling error:", err);
       }
@@ -1840,5 +1913,4 @@
     pollState();
   </script>
 </body>
-
 </html>
