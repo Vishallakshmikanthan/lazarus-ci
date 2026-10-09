@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LAZARUS-CI // Autonomous SRE & Self-Healing CI/CD</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0a0d13;
+      --panel-bg: rgba(18, 23, 34, 0.75);
+      --card-bg: rgba(23, 30, 44, 0.85);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-glow: rgba(56, 139, 253, 0.4);
+      --text-main: #f0f6fc;
+      --text-muted: #8b949e;
+      --text-dim: #484f58;
+      
+      --accent-blue: #388bfd;
+      --accent-cyan: #39c5bb;
+      --color-pass: #2ea043;
+      --color-fail: #f85149;
+      --color-warn: #e3b341;
+      --color-purple: #a371f7;
+      --color-running: #2f81f7;
+      
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'Fira Code', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(56, 139, 253, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(163, 113, 247, 0.06) 0%, transparent 45%);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Top Nav / Header */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 24px;
+      background: var(--panel-bg);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo {
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #2ea043, #388bfd);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 20px;
+      color: white;
+      box-shadow: 0 0 20px rgba(56, 139, 253, 0.4);
+    }
+
+    .brand-title {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      background: linear-gradient(90deg, #fff, #8b949e);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-subtitle {
+      font-size: 11px;
+      color: var(--accent-cyan);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .header-meta {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+    }
+
+    .badge-running { background: rgba(56, 139, 253, 0.15); color: var(--accent-blue); border: 1px solid var(--accent-blue); }
+    .badge-passed { background: rgba(46, 160, 67, 0.15); color: var(--color-pass); border: 1px solid var(--color-pass); }
+    .badge-failed { background: rgba(248, 81, 73, 0.15); color: var(--color-fail); border: 1px solid var(--color-fail); }
+    .badge-awaiting { background: rgba(227, 179, 65, 0.15); color: var(--color-warn); border: 1px solid var(--color-warn); animation: pulse 1.5s infinite; }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.85; transform: scale(1.02); }
+    }
+
+    /* Grid Layout */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 1024px) {
+      .dashboard-grid { grid-template-columns: 1fr; }
+    }
+
+    /* Cards */
+    .card {
+      background: var(--panel-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 12px;
+    }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Pipeline Stage Strip */
+    .pipeline-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .stage-node {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+      transition: all 0.25s ease;
+      position: relative;
+    }
+
+    .stage-node.passed {
+      border-color: rgba(46, 160, 67, 0.5);
+      background: rgba(46, 160, 67, 0.1);
+      box-shadow: 0 0 12px rgba(46, 160, 67, 0.2);
+    }
+
+    .stage-node.failed {
+      border-color: rgba(248, 81, 73, 0.5);
+      background: rgba(248, 81, 73, 0.12);
+      box-shadow: 0 0 16px rgba(248, 81, 73, 0.3);
+    }
+
+    .stage-node.running {
+      border-color: rgba(56, 139, 253, 0.6);
+      background: rgba(56, 139, 253, 0.12);
+      box-shadow: 0 0 16px rgba(56, 139, 253, 0.3);
+      animation: stagePulse 1.2s infinite;
+    }
+
+    @keyframes stagePulse {
+      0%, 100% { border-color: rgba(56, 139, 253, 0.4); }
+      50% { border-color: rgba(56, 139, 253, 0.9); }
+    }
+
+    .stage-node.blocked, .stage-node.pending {
+      opacity: 0.45;
+    }
+
+    .stage-name {
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .stage-status {
+      font-size: 11px;
+      font-family: var(--font-mono);
+      margin-top: 4px;
+      color: var(--text-muted);
+    }
+
+    /* Hypothesis Board */
+    .hypo-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .hypo-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: border-color 0.2s;
+    }
+
+    .hypo-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .hypo-id {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent-cyan);
+    }
+
+    .hypo-stmt {
+      font-size: 13.5px;
+      line-height: 1.4;
+      font-weight: 500;
+    }
+
+    .hypo-experiment {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 6px 10px;
+      border-radius: 6px;
+      color: #79c0ff;
+      border-left: 2px solid var(--accent-blue);
+    }
+
+    .hypo-evidence {
+      font-size: 12px;
+      color: var(--text-muted);
+      border-left: 2px solid rgba(255, 255, 255, 0.15);
+      padding-left: 8px;
+      margin-top: 2px;
+    }
+
+    /* Verdict Badges */
+    .verdict-badge {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .verdict-confirmed { background: rgba(46, 160, 67, 0.2); color: #3fb950; border: 1px solid #2ea043; }
+    .verdict-rejected { background: rgba(248, 81, 73, 0.2); color: #f85149; border: 1px solid #f85149; }
+    .verdict-symptom_only { background: rgba(227, 179, 65, 0.2); color: #e3b341; border: 1px solid #e3b341; }
+    .verdict-inconclusive { background: rgba(139, 148, 158, 0.2); color: #8b949e; border: 1px solid #8b949e; }
+
+    /* Human Approval Banner */
+    .approval-modal {
+      background: linear-gradient(135deg, rgba(227, 179, 65, 0.15), rgba(248, 81, 73, 0.1));
+      border: 1px solid var(--color-warn);
+      border-radius: 10px;
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: 0 0 24px rgba(227, 179, 65, 0.2);
+      animation: alertPulse 2s infinite ease-in-out;
+    }
+
+    @keyframes alertPulse {
+      0%, 100% { border-color: rgba(227, 179, 65, 0.6); }
+      50% { border-color: rgba(227, 179, 65, 1); }
+    }
+
+    .approval-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .approval-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--color-warn);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .approval-diff {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 10px 14px;
+      border-radius: 6px;
+      color: #f0f6fc;
+      overflow-x: auto;
+    }
+
+    .approval-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    /* Buttons */
+    .btn {
+      font-family: var(--font-sans);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .btn:hover { transform: translateY(-1px); filter: brightness(1.1); }
+    .btn:active { transform: translateY(0); }
+
+    .btn-primary { background: linear-gradient(135deg, #1f6feb, #388bfd); color: white; }
+    .btn-danger { background: linear-gradient(135deg, #da3633, #f85149); color: white; }
+    .btn-approve { background: linear-gradient(135deg, #238636, #2ea043); color: white; }
+    .btn-reject { background: linear-gradient(135deg, #da3633, #f85149); color: white; }
+    .btn-secondary { background: rgba(255, 255, 255, 0.08); color: var(--text-main); border: 1px solid var(--border-subtle); }
+
+    /* Timeline */
+    .timeline-container {
+      max-height: 420px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-right: 4px;
+    }
+
+    .timeline-container::-webkit-scrollbar { width: 6px; }
+    .timeline-container::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 4px; }
+
+    .timeline-item {
+      display: flex;
+      gap: 12px;
+      font-size: 12.5px;
+      padding: 8px 12px;
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: 6px;
+      border-left: 3px solid var(--border-subtle);
+    }
+
+    .timeline-item.alert { border-left-color: var(--color-fail); }
+    .timeline-item.triage { border-left-color: var(--accent-cyan); }
+    .timeline-item.hypotheses { border-left-color: var(--color-purple); }
+    .timeline-item.experiment { border-left-color: var(--accent-blue); }
+    .timeline-item.verdicts { border-left-color: var(--color-warn); }
+    .timeline-item.apply { border-left-color: var(--accent-blue); }
+    .timeline-item.verify { border-left-color: #56d364; }
+    .timeline-item.resolved { border-left-color: var(--color-pass); background: rgba(46, 160, 67, 0.1); }
+    .timeline-item.escalated { border-left-color: var(--color-fail); background: rgba(248, 81, 73, 0.1); }
+
+    .item-kind {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      color: var(--text-main);
+      min-width: 85px;
+      text-transform: uppercase;
+      font-size: 11px;
+    }
+
+    .item-payload {
+      color: var(--text-muted);
+      word-break: break-all;
+    }
+
+    /* Benchmarking & Handoff Table */
+    .bench-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .bench-table th, .bench-table td {
+      padding: 10px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .bench-table th {
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 0.5px;
+    }
+
+    .bench-highlight {
+      font-weight: 700;
+      color: var(--color-pass);
+    }
+
+    .handoff-box {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 14px;
+      border-radius: 8px;
+      color: #e6edf3;
+      white-space: pre-wrap;
+      line-height: 1.45;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    /* Chaos Trigger Panel */
+    .chaos-panel {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <header>
+    <div class="brand">
+      <div class="brand-logo">&#x2694;</div>
+      <div>
+        <div class="brand-title">LAZARUS-CI // MISSION CONTROL</div>
+        <div class="brand-subtitle">Autonomous SRE & Self-Healing CI/CD Pipeline Agent</div>
+      </div>
+    </div>
+    <div class="header-meta">
+      <div id="status-badge" class="badge badge-running">STANDBY</div>
+      <div id="incident-timer" style="font-family: var(--font-mono); font-size: 13px; color: var(--text-muted);">0.0s</div>
+    </div>
+  </header>
+
+  <!-- Pipeline Health & Chaos Trigger -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Live Pipeline Execution State</div>
+      <div class="chaos-panel">
+        <button class="btn btn-primary" onclick="startIncident()">&#x26A1; Break Pipeline</button>
+        <button class="btn btn-secondary" onclick="runBenchmark()">&#x1F4CA; Run Benchmark (6x)</button>
+      </div>
+    </div>
+    
+    <div id="pipeline-strip" class="pipeline-strip">
+      <div class="stage-node pending" id="stage-clone">
+        <div class="stage-name">1. Clone</div>
+        <div class="stage-status" id="status-clone">PENDING</div>
+      </div>
+      <div class="stage-node pending" id="stage-build">
+        <div class="stage-name">2. Build</div>
+        <div class="stage-status" id="status-build">PENDING</div>
+      </div>
+      <div class="stage-node pending" id="stage-test">
+        <div class="stage-name">3. Test</div>
+        <div class="stage-status" id="status-test">PENDING</div>
+      </div>
+      <div class="stage-node pending" id="stage-deploy">
+        <div class="stage-name">4. Deploy</div>
+        <div class="stage-status" id="status-deploy">PENDING</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Human Approval Modal (Dynamic) -->
+  <div id="approval-section" style="display: none;"></div>
+
+  <!-- Main Split Grid -->
+  <div class="dashboard-grid">
+    
+    <!-- Left Column: Hypothesis Board -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">&#x1F9E0; Hypothesis-Driven Investigation Board</div>
+        <span id="cycle-badge" class="badge" style="background: rgba(255,255,255,0.06); color: var(--text-muted);">Cycle 1/3</span>
+      </div>
+      <div id="hypothesis-container" class="hypo-grid">
+        <div style="color: var(--text-dim); font-size: 13px; text-align: center; padding: 32px 0;">
+          Awaiting pipeline failure event to trigger triage and hypothesis formulation...
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Live Event Stream -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">&#x1F4E1; Autonomous SRE Timeline</div>
+        <span id="event-count" style="font-family: var(--font-mono); font-size: 12px; color: var(--text-muted);">0 events</span>
+      </div>
+      <div id="timeline-container" class="timeline-container">
+        <div style="color: var(--text-dim); font-size: 13px; text-align: center; padding: 32px 0;">
+          Timeline idle. No active incident running.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom Grid: Benchmark & Escalation Handoff -->
+  <div class="dashboard-grid">
+    
+    <!-- Benchmark Comparison -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">&#x2696;&#xFE0F; Empirical Benchmark (Lazarus vs Naive Agent)</div>
+      </div>
+      <table class="bench-table">
+        <thead>
+          <tr>
+            <th>Agent</th>
+            <th>Episodes</th>
+            <th>Resolved %</th>
+            <th>Avg Steps</th>
+            <th>Destructive Actions</th>
+            <th>Score</th>
+          </tr>
+        </thead>
+        <tbody id="bench-body">
+          <tr>
+            <td><strong style="color: #58a6ff;">Lazarus-CI</strong></td>
+            <td id="laz-n">-</td>
+            <td id="laz-res" class="bench-highlight">-</td>
+            <td id="laz-steps">-</td>
+            <td id="laz-destr" style="color: var(--color-pass); font-weight: 700;">0.0</td>
+            <td id="laz-score" class="bench-highlight">-</td>
+          </tr>
+          <tr>
+            <td><span style="color: var(--text-muted);">Naive "Chat with Logs"</span></td>
+            <td id="naive-n">-</td>
+            <td id="naive-res">-</td>
+            <td id="naive-steps">-</td>
+            <td id="naive-destr" style="color: var(--color-fail);">-</td>
+            <td id="naive-score">-</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Handoff / Final Resolution Card -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">&#x1F4CB; SRE Handoff Report / Verdict</div>
+      </div>
+      <div id="handoff-content">
+        <div style="color: var(--text-dim); font-size: 13px; text-align: center; padding: 24px 0;">
+          No escalation handoff generated. Pipeline operating under autonomous control.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const API_BASE = "";
+    let activeIncidentId = null;
+
+    async function startIncident() {
+      try {
+        const res = await fetch(`${API_BASE}/incident/start`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({})
+        });
+        const data = await res.json();
+        activeIncidentId = data.incident_id;
+        pollState();
+      } catch (err) {
+        console.error("Failed to start incident:", err);
+      }
+    }
+
+    async function runBenchmark() {
+      try {
+        await fetch(`${API_BASE}/bench/run`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ n: 6 })
+        });
+        alert("Benchmark started in background! Updating statistics in real-time.");
+      } catch (err) {
+        console.error("Benchmark failed to trigger:", err);
+      }
+    }
+
+    async function submitApproval(approved) {
+      if (!activeIncidentId) return;
+      try {
+        await fetch(`${API_BASE}/incident/${activeIncidentId}/approve`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ approved })
+        });
+        pollState();
+      } catch (err) {
+        console.error("Failed to submit approval:", err);
+      }
+    }
+
+    function renderStages(stages) {
+      const canonical = ["clone", "build", "test", "deploy"];
+      canonical.forEach(s => {
+        const el = document.getElementById(`stage-${s}`);
+        const statusEl = document.getElementById(`status-${s}`);
+        const status = (stages && stages[s]) ? stages[s].toLowerCase() : "pending";
+        
+        el.className = `stage-node ${status}`;
+        statusEl.textContent = status.toUpperCase();
+      });
+    }
+
+    function renderHypotheses(events) {
+      const hyEv = [...events].reverse().find(e => e.kind === "hypotheses");
+      const vdEv = [...events].reverse().find(e => e.kind === "verdicts");
+      const container = document.getElementById("hypothesis-container");
+
+      if (!hyEv || !hyEv.payload || !hyEv.payload.hypotheses) {
+        return;
+      }
+
+      const hyps = hyEv.payload.hypotheses;
+      const verdicts = {};
+      if (vdEv && vdEv.payload && vdEv.payload.verdicts) {
+        vdEv.payload.verdicts.forEach(v => verdicts[v.id] = v);
+      }
+
+      container.innerHTML = hyps.map(h => {
+        const v = verdicts[h.id];
+        const verdictClass = v ? `verdict-${v.verdict}` : "verdict-inconclusive";
+        const verdictText = v ? v.verdict : "Testing...";
+        const evidenceText = v ? v.evidence : (h.confirm_if ? `Confirm condition: ${h.confirm_if}` : "Awaiting experiment...");
+
+        return `
+          <div class="hypo-card">
+            <div class="hypo-header">
+              <span class="hypo-id">${h.id}</span>
+              <span class="verdict-badge ${verdictClass}">${verdictText}</span>
+            </div>
+            <div class="hypo-stmt">${h.statement}</div>
+            <div class="hypo-experiment">&#x1F52C; Experiment: ${h.action?.operation || "inspect"} [${h.action?.target || "all"}]</div>
+            <div class="hypo-evidence">${evidenceText}</div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function renderApproval(inc) {
+      const approvalSec = document.getElementById("approval-section");
+      if (inc && inc.status === "awaiting_approval" && inc.approval) {
+        approvalSec.style.display = "block";
+        const fix = inc.approval.fix || {};
+        const reasons = (inc.approval.reasons || []).join(", ");
+        approvalSec.innerHTML = `
+          <div class="approval-modal">
+            <div class="approval-top">
+              <div class="approval-title">&#x26A0;&#xFE0F; SRE Risk Gate: Human Approval Required</div>
+              <span class="badge badge-awaiting">AWAITING VERDICT</span>
+            </div>
+            <div style="font-size: 13px; color: var(--text-main);">
+              <strong>Risk Assessment:</strong> ${reasons || "Modification touches protected service configuration"}<br>
+              <strong>Suspected Root Cause:</strong> ${inc.approval.root_cause || "Configuration drift"}
+            </div>
+            <div class="approval-diff">
+              &gt; OPERATION: ${fix.operation || "modify_config"}<br>
+              &gt; TARGET:    ${fix.target || ""}<br>
+              &gt; VALUE:     ${fix.value || ""}
+            </div>
+            <div class="approval-actions">
+              <button class="btn btn-approve" onclick="submitApproval(true)">&#x2705; Approve &amp; Execute Fix</button>
+              <button class="btn btn-reject" onclick="submitApproval(false)">&#x274C; Reject &amp; Escalate</button>
+            </div>
+          </div>
+        `;
+      } else {
+        approvalSec.style.display = "none";
+      }
+    }
+
+    function renderTimeline(events) {
+      const container = document.getElementById("timeline-container");
+      document.getElementById("event-count").textContent = `${events.length} events`;
+      if (!events || events.length === 0) return;
+
+      container.innerHTML = events.slice(-30).map(e => {
+        let details = "";
+        try {
+          details = JSON.stringify(e.payload);
+        } catch (_) { details = String(e.payload); }
+
+        return `
+          <div class="timeline-item ${e.kind}">
+            <div class="item-kind">${e.kind}</div>
+            <div class="item-payload">${details.slice(0, 240)}</div>
+          </div>
+        `;
+      }).join("");
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function renderBench(bench) {
+      if (!bench) return;
+      const laz = bench.lazarus;
+      const naive = bench.naive;
+
+      if (laz) {
+        document.getElementById("laz-n").textContent = `${laz.resolved}/${laz.n}`;
+        document.getElementById("laz-res").textContent = `${Math.round((laz.resolved / laz.n) * 100)}%`;
+        document.getElementById("laz-steps").textContent = laz.avg_steps;
+        document.getElementById("laz-destr").textContent = laz.avg_destructive;
+        document.getElementById("laz-score").textContent = laz.avg_score.toFixed(2);
+      }
+      if (naive) {
+        document.getElementById("naive-n").textContent = `${naive.resolved}/${naive.n}`;
+        document.getElementById("naive-res").textContent = `${Math.round((naive.resolved / naive.n) * 100)}%`;
+        document.getElementById("naive-steps").textContent = naive.avg_steps;
+        document.getElementById("naive-destr").textContent = naive.avg_destructive;
+        document.getElementById("naive-score").textContent = naive.avg_score.toFixed(2);
+      }
+    }
+
+    function renderHandoff(inc) {
+      const container = document.getElementById("handoff-content");
+      if (inc && inc.handoff) {
+        container.innerHTML = `
+          <div style="margin-bottom: 8px;">
+            <span class="badge badge-failed">&#x1F6A8; INCIDENT ESCALATED TO ON-CALL HUMAN</span>
+          </div>
+          <div class="handoff-box">${JSON.stringify(inc.handoff, null, 2)}</div>
+        `;
+      } else if (inc && inc.status === "resolved") {
+        container.innerHTML = `
+          <div style="background: rgba(46,160,67,0.12); border: 1px solid var(--color-pass); padding: 16px; border-radius: 8px;">
+            <div style="font-weight: 700; color: var(--color-pass); font-size: 14px; margin-bottom: 4px;">
+              &#x2705; INCIDENT AUTONOMOUSLY RESOLVED &amp; VERIFIED
+            </div>
+            <div style="font-size: 13px; color: var(--text-muted);">
+              All pipeline stages restored to green status. Verification executed independently with zero regressions.
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    async function pollState() {
+      try {
+        const res = await fetch(`${API_BASE}/api/state`);
+        const data = await res.json();
+        const inc = data.incident;
+        const events = data.events || [];
+
+        if (inc) {
+          activeIncidentId = inc.id;
+          const statusBadge = document.getElementById("status-badge");
+          statusBadge.textContent = inc.status.toUpperCase();
+          statusBadge.className = `badge ${inc.status === 'resolved' ? 'badge-passed' : inc.status === 'escalated' ? 'badge-failed' : inc.status === 'awaiting_approval' ? 'badge-awaiting' : 'badge-running'}`;
+
+          const duration = ((inc.resolved_at || data.now) - inc.created_at).toFixed(1);
+          document.getElementById("incident-timer").textContent = `Incident #${inc.id} (${duration}s)`;
+
+          renderStages(inc.stages);
+          renderApproval(inc);
+          renderHandoff(inc);
+        }
+
+        renderHypotheses(events);
+        renderTimeline(events);
+        renderBench(data.bench);
+      } catch (err) {
+        console.error("Polling error:", err);
+      }
+    }
+
+    setInterval(pollState, 1000);
+    pollState();
+  </script>
+</body>
+</html>
