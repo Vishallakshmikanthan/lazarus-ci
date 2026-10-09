@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import logging
 import threading
-import time
+import os
 from pathlib import Path
 from typing import Any, Dict, Optional
 
@@ -17,8 +17,9 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from . import agent, bench, store
+from . import agent, agent_gh, bench, chaos_gh, insights, store, telegram_bot
 from .envclient import Env
+from .github_env import GitHubEnv
 
 logger = logging.getLogger(__name__)
 
@@ -36,12 +37,21 @@ STATIC_DIR = Path(__file__).parent / "static"
 STATIC_DIR.mkdir(parents=True, exist_ok=True)
 
 
+@app.on_event("startup")
+def _on_startup():
+    """Initialize background services including Telegram approval bot."""
+    telegram_bot.start(store.decide)
+
+
 class StartReq(BaseModel):
     fault: Optional[str] = None
+    run_id: Optional[int] = None
+    repo: Optional[str] = None
 
 
 class ApproveReq(BaseModel):
     approved: bool
+
 
 
 @app.get("/")
@@ -271,37 +281,101 @@ def list_chaos_faults():
 @app.post("/incident/start")
 def start_incident(req: Optional[StartReq] = None):
     """Trigger an autonomous incident repair cycle."""
+    running = [i for i in store.INCIDENTS.values() if i.get("status") in ("running", "awaiting_approval")]
+    if running:
+        return {"incident_id": running[0]["id"], "already_running": True, "status": running[0]["status"]}
+
     inc_id = store.new_incident()
     fault = req.fault if req and req.fault else None
+    run_id = req.run_id if req and req.run_id else None
+    repo_name = req.repo if req and req.repo else None
+
     if fault and inc_id in store.INCIDENTS:
         store.INCIDENTS[inc_id]["fault"] = fault
-    reset_kwargs = {"task_key": fault} if fault else {}
+
+    backend_env = os.getenv("ENV_BACKEND", "").lower()
+    is_github = backend_env == "github" or run_id is not None or (repo_name is not None) or bool(os.getenv("GITHUB_REPO"))
 
     def background_repair():
-        env = Env()
-        try:
-            obs = env.reset(**reset_kwargs)
-        except Exception as e:
-            logger.error("Sandbox reset failed for incident %d: %s", inc_id, e)
-            store.emit(inc_id, "error", error=f"reset failed: {e}")
-            store.finish(
-                inc_id,
-                "escalated",
-                handoff={"reason": f"could not initialize sandbox environment: {e}"},
-            )
-            return
+        if is_github:
+            logger.info("Executing incident %d with real GitHub backend (run_id: %s)", inc_id, run_id)
+            try:
+                env = GitHubEnv(repo=repo_name)
+                agent_gh.run_incident_gh(
+                    inc_id,
+                    env,
+                    store,
+                    store.wait_for_approval,
+                    run_id=run_id,
+                )
+            except Exception as e:
+                logger.exception("GitHub repair failed for incident %d: %s", inc_id, e)
+                store.emit(inc_id, "error", error=f"GitHub execution error: {e}")
+                store.finish(inc_id, "escalated", handoff={"reason": f"GitHub execution error: {e}"})
+        else:
+            logger.info("Executing incident %d with OpenEnv sandbox backend", inc_id)
+            env = Env()
+            reset_kwargs = {"task_key": fault} if fault else {}
+            try:
+                obs = env.reset(**reset_kwargs)
+            except Exception as e:
+                logger.error("Sandbox reset failed for incident %d: %s", inc_id, e)
+                store.emit(inc_id, "error", error=f"reset failed: {e}")
+                store.finish(
+                    inc_id,
+                    "escalated",
+                    handoff={"reason": f"could not initialize sandbox environment: {e}"},
+                )
+                return
 
-        agent.run_incident(
-            inc_id,
-            env,
-            store,
-            store.wait_for_approval,
-            obs=obs,
-        )
+            agent.run_incident(
+                inc_id,
+                env,
+                store,
+                store.wait_for_approval,
+                obs=obs,
+            )
 
     t = threading.Thread(target=background_repair, daemon=True)
     t.start()
-    return {"incident_id": inc_id, "status": "started", "fault": fault}
+    return {
+        "incident_id": inc_id,
+        "status": "started",
+        "fault": fault,
+        "backend": "github" if is_github else "openenv",
+    }
+
+
+@app.get("/api/insights")
+def get_insights():
+    """Return MTTR and incident insights calculated from the event ledger."""
+    incs = list(store.INCIDENTS.values())
+    return {
+        "incident": insights.incident_insights(incs[-1]) if incs else None,
+        "fleet": insights.fleet_insights(incs),
+    }
+
+
+@app.post("/chaos/{fault}")
+def trigger_chaos(fault: str, repo: Optional[str] = None):
+    """Inject a simulated fault or reset the GitHub demo repository."""
+    if fault in ("reset", "--reset"):
+        return chaos_gh.reset(repo=repo)
+    if fault in ("init", "--init"):
+        return chaos_gh.init_repo(repo=repo)
+    return chaos_gh.break_repo(fault, repo=repo)
+
+
+@app.get("/api/config")
+def get_config():
+    """Return environment and service integration status."""
+    return {
+        "github_repo": os.getenv("GITHUB_REPO", ""),
+        "github_configured": bool(os.getenv("GITHUB_TOKEN")),
+        "telegram_configured": telegram_bot.enabled(),
+        "backend": "github" if (os.getenv("ENV_BACKEND") == "github" or os.getenv("GITHUB_REPO")) else "openenv",
+    }
+
 
 
 @app.get("/incident/{inc_id}/status")
