@@ -1,0 +1,175 @@
+{
+  "evaluation_date": "2026-04-07",
+  "episodes_per_task": 3,
+  "success_threshold": 0.2,
+  "tasks": {
+    "easy": {
+      "resolved_rate": 1.0,
+      "success_rate": 1.0,
+      "avg_score": 0.735,
+      "avg_deterministic_score": 0.621,
+      "avg_rubric_score": 1.0,
+      "avg_delayed_reward": 0.114,
+      "avg_steps": 7.0,
+      "rubric_fallbacks": 0,
+      "episodes": [
+        {
+          "episode": 1,
+          "variant": "easy_v1",
+          "steps": 7,
+          "score": 0.735,
+          "det": 0.621,
+          "rubric": 1.0,
+          "delayed": 0.114,
+          "resolved": true
+        },
+        {
+          "episode": 2,
+          "variant": "easy_v2",
+          "steps": 7,
+          "score": 0.735,
+          "det": 0.621,
+          "rubric": 1.0,
+          "delayed": 0.114,
+          "resolved": true
+        },
+        {
+          "episode": 3,
+          "variant": "easy_v1",
+          "steps": 7,
+          "score": 0.735,
+          "det": 0.621,
+          "rubric": 1.0,
+          "delayed": 0.114,
+          "resolved": true
+        }
+      ]
+    },
+    "medium": {
+      "resolved_rate": 1.0,
+      "success_rate": 1.0,
+      "avg_score": 0.617,
+      "avg_deterministic_score": 0.507,
+      "avg_rubric_score": 0.967,
+      "avg_delayed_reward": 0.11,
+      "avg_steps": 11.0,
+      "rubric_fallbacks": 2,
+      "episodes": [
+        {
+          "episode": 1,
+          "variant": "medium_v1",
+          "steps": 11,
+          "score": 0.617,
+          "det": 0.507,
+          "rubric": 0.9,
+          "delayed": 0.11,
+          "resolved": true
+        },
+        {
+          "episode": 2,
+          "variant": "medium_v2",
+          "steps": 11,
+          "score": 0.617,
+          "det": 0.507,
+          "rubric": 1.0,
+          "delayed": 0.11,
+          "resolved": true
+        },
+        {
+          "episode": 3,
+          "variant": "medium_v1",
+          "steps": 11,
+          "score": 0.617,
+          "det": 0.507,
+          "rubric": 1.0,
+          "delayed": 0.11,
+          "resolved": true
+        }
+      ]
+    },
+    "security": {
+      "resolved_rate": 1.0,
+      "success_rate": 1.0,
+      "avg_score": 0.542,
+      "avg_deterministic_score": 0.442,
+      "avg_rubric_score": 0.892,
+      "avg_delayed_reward": 0.1,
+      "avg_steps": 12.0,
+      "rubric_fallbacks": 3,
+      "episodes": [
+        {
+          "episode": 1,
+          "variant": "security_v1",
+          "steps": 12,
+          "score": 0.542,
+          "det": 0.442,
+          "rubric": 0.892,
+          "delayed": 0.1,
+          "resolved": true
+        },
+        {
+          "episode": 2,
+          "variant": "security_v2",
+          "steps": 12,
+          "score": 0.542,
+          "det": 0.442,
+          "rubric": 0.892,
+          "delayed": 0.1,
+          "resolved": true
+        },
+        {
+          "episode": 3,
+          "variant": "security_v1",
+          "steps": 12,
+          "score": 0.542,
+          "det": 0.442,
+          "rubric": 0.892,
+          "delayed": 0.1,
+          "resolved": true
+        }
+      ]
+    },
+    "hard": {
+      "resolved_rate": 1.0,
+      "success_rate": 1.0,
+      "avg_score": 0.5,
+      "avg_deterministic_score": 0.42,
+      "avg_rubric_score": 1.0,
+      "avg_delayed_reward": 0.08,
+      "avg_steps": 14.0,
+      "rubric_fallbacks": 3,
+      "episodes": [
+        {
+          "episode": 1,
+          "variant": "hard_v1",
+          "steps": 14,
+          "score": 0.5,
+          "det": 0.42,
+          "rubric": 1.0,
+          "delayed": 0.08,
+          "resolved": true
+        },
+        {
+          "episode": 2,
+          "variant": "hard_v2",
+          "steps": 14,
+          "score": 0.5,
+          "det": 0.42,
+          "rubric": 1.0,
+          "delayed": 0.08,
+          "resolved": true
+        },
+        {
+          "episode": 3,
+          "variant": "hard_v1",
+          "steps": 14,
+          "score": 0.5,
+          "det": 0.42,
+          "rubric": 1.0,
+          "delayed": 0.08,
+          "resolved": true
+        }
+      ]
+    }
+  }
+}

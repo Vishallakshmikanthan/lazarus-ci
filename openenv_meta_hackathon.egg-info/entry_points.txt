@@ -1,0 +1,3 @@
+[console_scripts]
+inference = meta_hackathon.inference:main
+server = meta_hackathon.server.app:main

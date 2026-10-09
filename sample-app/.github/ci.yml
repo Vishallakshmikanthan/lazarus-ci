@@ -1,0 +1,34 @@
+# CI/CD Pipeline Configuration
+# This file is a reference; the pipeline runs locally via subprocess.
+
+name: CI Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Secret Scan
+        run: |
+          # Scan for hardcoded secrets in source files
+          if grep -rn "sk-live-\|sk-test-\|API_KEY\s*=\s*['\"]" services/ --include="*.py"; then
+            echo "ERROR: Hardcoded secrets detected in source code"
+            exit 1
+          fi
+
+      - name: Build Docker Image
+        run: docker build -t sample-app:ci .
+
+      - name: Run Tests
+        run: docker run --rm sample-app:ci python -m pytest tests/ -v
+
+      - name: Deploy
+        run: docker compose up -d

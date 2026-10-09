@@ -1,0 +1,38 @@
+spec_version: 1
+name: meta_hackathon
+type: space
+runtime: fastapi
+app: server.app:app
+port: 8000
+description: OpenEnv benchmark for real CI/CD pipeline repair (git + docker).
+tasks:
+  - task_id: easy_merge_conflict
+    key: easy
+    title: Resolve failing merge stage
+    difficulty: easy
+    fault_type: merge_conflict
+  - task_id: flaky_test
+    key: flaky
+    title: Stabilize intermittent flaky test failures
+    difficulty: easy
+    fault_type: flaky_test
+  - task_id: medium_docker_dep_failure
+    key: medium
+    title: Repair docker build dependency failure
+    difficulty: medium
+    fault_type: dependency_conflict
+  - task_id: network_outage
+    key: network
+    title: Recover from broken deploy permissions / missing network
+    difficulty: medium
+    fault_type: missing_permission
+  - task_id: security_secrets_iam_misconfig
+    key: security
+    title: Remove committed secret that blocks the security scan
+    difficulty: security
+    fault_type: secret_exposure
+  - task_id: hard_multiservice_cascade
+    key: hard
+    title: Fix broken Dockerfile layer ordering
+    difficulty: hard
+    fault_type: docker_order

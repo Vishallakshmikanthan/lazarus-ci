@@ -1,0 +1,57 @@
+# Copyright (c) Meta Platforms, Inc. and affiliates.
+# All rights reserved.
+#
+# This source code is licensed under the BSD-style license found in the
+# LICENSE file in the root directory of this source tree.
+#
+# Fault-injection flags (set in .env or shell before `docker compose up`):
+#   BAD_MIGRATION_SQL=true
+# See db/faults.py for the full registry.
+
+services:
+
+  env-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: meta-hackathon-env:latest
+    command: ["sh", "-c", "cd /app/env && uvicorn server.app:app --host 0.0.0.0 --port 8000"]
+    ports:
+      - "8000:8000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - pipeline-workspaces:/tmp/workspaces
+      - ./logs:/app/logs
+    environment:
+      - PIPELINE_WORKSPACES_ROOT=/tmp/workspaces
+      - ENABLE_WEB_INTERFACE=true
+      - LOG_PATH=/app/logs/app.log
+      - LOG_LEVEL=INFO
+      - SERVICE_NAME=env-server
+      - BAD_MIGRATION_SQL=${BAD_MIGRATION_SQL:-false}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+
+  agent:
+    build:
+      context: .
+      dockerfile: agent/Dockerfile
+    image: meta-hackathon-agent:latest
+    depends_on:
+      env-server:
+        condition: service_healthy
+    environment:
+      - ENV_BASE_URL=http://env-server:8000
+      - MODEL_NAME=${MODEL_NAME:-}
+      - API_BASE_URL=${API_BASE_URL:-https://router.huggingface.co/v1}
+      - HF_TOKEN=${HF_TOKEN:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - INFERENCE_VERBOSE=${INFERENCE_VERBOSE:-false}
+    command: ["python", "-m", "agent.runner"]
+
+volumes:
+  pipeline-workspaces:

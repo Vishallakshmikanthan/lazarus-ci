@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -c \"import openenv; print\\(openenv.__file__\\)\")",
+      "Bash(uv run *)",
+      "Bash(python -c \"from cicd.pipeline_runner import PipelineRunner; from cicd.fault_injector import FAULT_TYPES; from cicd.observation_builder import build_observation; from cicd.fix_applier import apply_fix; print\\('cicd imports OK'\\)\")",
+      "Bash(python -c \"from server.environment import RealCICDRepairEnvironment; print\\('server.environment imports OK'\\)\")",
+      "Bash(python -c \"from server.curriculum import CurriculumController; print\\('curriculum ok'\\)\")",
+      "Bash(python -c ' *)",
+      "Bash(python -c \"import ast; ast.parse\\(open\\('models.py'\\).read\\(\\)\\); print\\('models ok'\\)\")",
+      "Bash(python -c \"import ast; ast.parse\\(open\\('server/adversarial_designer.py'\\).read\\(\\)\\); print\\('ok'\\)\")",
+      "Bash(python -c \"import ast; ast.parse\\(open\\('server/environment.py'\\).read\\(\\)\\); print\\('✓ syntax ok'\\)\")",
+      "Bash(python -c \"import ast; ast.parse\\(open\\('server/environment.py'\\).read\\(\\)\\); print\\('syntax ok'\\)\")",
+      "Bash(python -c \"import ast; ast.parse\\(open\\('cicd/observation_builder.py'\\).read\\(\\)\\); ast.parse\\(open\\('server/environment.py'\\).read\\(\\)\\); print\\('syntax ok'\\)\")",
+      "Bash(python -c \"import os; print\\(repr\\(os.getenv\\('CICD_GYM_MODE'\\)\\)\\)\")",
+      "Bash(python -c \"import ast; ast.parse\\(open\\('server/environment.py'\\).read\\(\\)\\); ast.parse\\(open\\('agent/prompts.py'\\).read\\(\\)\\); print\\('syntax ok'\\)\")",
+      "Bash(python -c \"import ast; ast.parse\\(open\\('cicd/observation_builder.py'\\).read\\(\\)\\); print\\('syntax ok'\\)\")",
+      "Bash(python -c \"import ast; ast.parse\\(open\\('agent/runner.py'\\).read\\(\\)\\); print\\('OK'\\)\")",
+      "Bash(python -c \"import py_compile; py_compile.compile\\('agent/runner.py', doraise=True\\); print\\('OK'\\)\")"
+    ]
+  }
+}
