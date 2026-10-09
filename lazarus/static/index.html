@@ -3,15 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LAZARUS-CI // Autonomous SRE & Self-Healing CI/CD</title>
+  <title>LAZARUS-CI // Autonomous SRE &amp; Self-Healing CI/CD</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg-dark: #0a0d13;
-      --panel-bg: rgba(18, 23, 34, 0.75);
-      --card-bg: rgba(23, 30, 44, 0.85);
+      --panel-bg: rgba(18, 23, 34, 0.78);
+      --card-bg: rgba(23, 30, 44, 0.88);
+      --card-inner: rgba(15, 20, 30, 0.9);
       --border-subtle: rgba(255, 255, 255, 0.08);
       --border-glow: rgba(56, 139, 253, 0.4);
       --text-main: #f0f6fc;
@@ -21,7 +22,9 @@
       --accent-blue: #388bfd;
       --accent-cyan: #39c5bb;
       --color-pass: #2ea043;
+      --color-pass-glow: #3fb950;
       --color-fail: #f85149;
+      --color-fail-glow: #ff7b72;
       --color-warn: #e3b341;
       --color-purple: #a371f7;
       --color-running: #2f81f7;
@@ -35,8 +38,9 @@
     body {
       background-color: var(--bg-dark);
       background-image: 
-        radial-gradient(circle at 15% 15%, rgba(56, 139, 253, 0.08) 0%, transparent 40%),
-        radial-gradient(circle at 85% 85%, rgba(163, 113, 247, 0.06) 0%, transparent 45%);
+        radial-gradient(circle at 12% 10%, rgba(56, 139, 253, 0.09) 0%, transparent 40%),
+        radial-gradient(circle at 88% 18%, rgba(248, 81, 73, 0.07) 0%, transparent 40%),
+        radial-gradient(circle at 50% 90%, rgba(163, 113, 247, 0.06) 0%, transparent 45%);
       color: var(--text-main);
       font-family: var(--font-sans);
       min-height: 100vh;
@@ -56,33 +60,34 @@
       backdrop-filter: blur(16px);
       border: 1px solid var(--border-subtle);
       border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     }
 
     .brand {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
     }
 
     .brand-logo {
-      width: 38px;
-      height: 38px;
-      border-radius: 8px;
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
       background: linear-gradient(135deg, #2ea043, #388bfd);
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 800;
-      font-size: 20px;
+      font-size: 22px;
       color: white;
-      box-shadow: 0 0 20px rgba(56, 139, 253, 0.4);
+      box-shadow: 0 0 20px rgba(56, 139, 253, 0.45);
     }
 
     .brand-title {
       font-size: 20px;
-      font-weight: 700;
+      font-weight: 800;
       letter-spacing: -0.5px;
-      background: linear-gradient(90deg, #fff, #8b949e);
+      background: linear-gradient(90deg, #ffffff, #a5d6ff 60%, #8b949e);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
@@ -90,9 +95,10 @@
     .brand-subtitle {
       font-size: 11px;
       color: var(--accent-cyan);
-      letter-spacing: 0.5px;
+      letter-spacing: 0.6px;
       text-transform: uppercase;
       font-weight: 600;
+      margin-top: 1px;
     }
 
     .header-meta {
@@ -106,20 +112,20 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 4px 10px;
+      padding: 5px 12px;
       border-radius: 20px;
       font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 0.3px;
+      font-weight: 700;
+      letter-spacing: 0.4px;
       text-transform: uppercase;
     }
 
     .badge-running { background: rgba(56, 139, 253, 0.15); color: var(--accent-blue); border: 1px solid var(--accent-blue); }
-    .badge-passed { background: rgba(46, 160, 67, 0.15); color: var(--color-pass); border: 1px solid var(--color-pass); }
-    .badge-failed { background: rgba(248, 81, 73, 0.15); color: var(--color-fail); border: 1px solid var(--color-fail); }
-    .badge-awaiting { background: rgba(227, 179, 65, 0.15); color: var(--color-warn); border: 1px solid var(--color-warn); animation: pulse 1.5s infinite; }
+    .badge-passed { background: rgba(46, 160, 67, 0.18); color: var(--color-pass-glow); border: 1px solid var(--color-pass); box-shadow: 0 0 10px rgba(46, 160, 67, 0.2); }
+    .badge-failed { background: rgba(248, 81, 73, 0.18); color: var(--color-fail-glow); border: 1px solid var(--color-fail); box-shadow: 0 0 10px rgba(248, 81, 73, 0.2); }
+    .badge-awaiting { background: rgba(227, 179, 65, 0.18); color: var(--color-warn); border: 1px solid var(--color-warn); animation: pulseAlert 1.5s infinite; }
 
-    @keyframes pulse {
+    @keyframes pulseAlert {
       0%, 100% { opacity: 1; transform: scale(1); }
       50% { opacity: 0.85; transform: scale(1.02); }
     }
@@ -158,7 +164,7 @@
 
     .card-title {
       font-size: 14px;
-      font-weight: 600;
+      font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.8px;
       color: var(--text-muted);
@@ -167,12 +173,433 @@
       gap: 8px;
     }
 
+    /* ========================================================
+       CHAOS PANEL UI
+       ======================================================== */
+    .chaos-container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .chaos-header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .chaos-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .demo-preset-group {
+      display: inline-flex;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.45);
+      padding: 4px;
+      border-radius: 8px;
+      border: 1px solid var(--border-subtle);
+      gap: 4px;
+    }
+
+    .preset-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--text-muted);
+      padding: 0 8px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .btn-preset {
+      font-size: 12px;
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      background: transparent;
+      color: var(--text-main);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-sans);
+    }
+
+    .btn-preset:hover {
+      background: rgba(255, 255, 255, 0.08);
+      transform: translateY(-1px);
+    }
+
+    .btn-preset.risk-gate {
+      color: #ff7b72;
+      border-color: rgba(248, 81, 73, 0.3);
+      background: rgba(248, 81, 73, 0.08);
+    }
+    .btn-preset.risk-gate:hover {
+      background: rgba(248, 81, 73, 0.2);
+      border-color: #f85149;
+      box-shadow: 0 0 12px rgba(248, 81, 73, 0.3);
+    }
+
+    .btn-preset.auto-heal {
+      color: #7ee787;
+      border-color: rgba(46, 160, 67, 0.3);
+      background: rgba(46, 160, 67, 0.08);
+    }
+    .btn-preset.auto-heal:hover {
+      background: rgba(46, 160, 67, 0.2);
+      border-color: #2ea043;
+      box-shadow: 0 0 12px rgba(46, 160, 67, 0.3);
+    }
+
+    .btn-preset.cascade {
+      color: #d2a8ff;
+      border-color: rgba(163, 113, 247, 0.3);
+      background: rgba(163, 113, 247, 0.08);
+    }
+    .btn-preset.cascade:hover {
+      background: rgba(163, 113, 247, 0.2);
+      border-color: #a371f7;
+      box-shadow: 0 0 12px rgba(163, 113, 247, 0.3);
+    }
+
+    .btn-preset.escalate {
+      color: #e3b341;
+      border-color: rgba(227, 179, 65, 0.3);
+      background: rgba(227, 179, 65, 0.08);
+    }
+    .btn-preset.escalate:hover {
+      background: rgba(227, 179, 65, 0.2);
+      border-color: #e3b341;
+      box-shadow: 0 0 12px rgba(227, 179, 65, 0.3);
+    }
+
+    /* Active Chaos Injection Banner */
+    .active-chaos-banner {
+      display: none;
+      background: linear-gradient(90deg, rgba(248, 81, 73, 0.14), rgba(56, 139, 253, 0.08));
+      border: 1px solid rgba(248, 81, 73, 0.4);
+      border-radius: 8px;
+      padding: 12px 18px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      animation: chaosPulse 3s infinite alternate;
+    }
+
+    @keyframes chaosPulse {
+      0% { border-color: rgba(248, 81, 73, 0.35); box-shadow: 0 0 12px rgba(248, 81, 73, 0.15); }
+      100% { border-color: rgba(248, 81, 73, 0.75); box-shadow: 0 0 24px rgba(248, 81, 73, 0.35); }
+    }
+
+    .active-chaos-info {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .active-chaos-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #ff7b72;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .active-chaos-meta {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      background: rgba(0, 0, 0, 0.35);
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+
+    .active-chaos-flow {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11.5px;
+      color: var(--accent-cyan);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Chaos Matrix Drawer */
+    .chaos-drawer {
+      display: none;
+      flex-direction: column;
+      gap: 14px;
+      background: rgba(14, 18, 28, 0.96);
+      border: 1px solid rgba(56, 139, 253, 0.3);
+      border-radius: 10px;
+      padding: 16px;
+      margin-top: 4px;
+      animation: drawerSlide 0.25s ease-out;
+    }
+
+    @keyframes drawerSlide {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .drawer-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .search-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 7px 12px;
+      flex: 1;
+      max-width: 320px;
+    }
+
+    .search-box:focus-within {
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 10px rgba(56, 139, 253, 0.25);
+    }
+
+    .search-input {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      font-size: 12px;
+      width: 100%;
+    }
+
+    .category-tabs {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .cat-tab {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 5px 12px;
+      font-size: 11.5px;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      font-weight: 600;
+      font-family: var(--font-sans);
+    }
+
+    .cat-tab:hover, .cat-tab.active {
+      background: rgba(56, 139, 253, 0.16);
+      border-color: var(--accent-blue);
+      color: #79c0ff;
+    }
+
+    .cat-tab.active-risk {
+      background: rgba(248, 81, 73, 0.16);
+      border-color: var(--color-fail);
+      color: #ff7b72;
+    }
+
+    /* Fault Cards Grid */
+    .fault-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+      gap: 12px;
+      max-height: 440px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .fault-grid::-webkit-scrollbar { width: 6px; }
+    .fault-grid::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 4px; }
+
+    .fault-card {
+      background: var(--card-inner);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .fault-card:hover {
+      border-color: rgba(56, 139, 253, 0.45);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+    }
+
+    .fault-card.risk-high {
+      border-left: 3px solid var(--color-fail);
+    }
+    .fault-card.risk-high:hover {
+      border-color: rgba(248, 81, 73, 0.6);
+      box-shadow: 0 4px 16px rgba(248, 81, 73, 0.2);
+    }
+
+    .fault-card.risk-medium {
+      border-left: 3px solid var(--color-warn);
+    }
+
+    .fault-card.risk-low {
+      border-left: 3px solid var(--color-pass);
+    }
+
+    .fault-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .fault-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-main);
+      line-height: 1.3;
+    }
+
+    .fault-badges {
+      display: flex;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+
+    .badge-stage {
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .badge-risk-high {
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: rgba(248, 81, 73, 0.18);
+      color: #ff7b72;
+      border: 1px solid rgba(248, 81, 73, 0.4);
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+
+    .badge-risk-med {
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: rgba(227, 179, 65, 0.15);
+      color: #e3b341;
+      border: 1px solid rgba(227, 179, 65, 0.3);
+      font-weight: 600;
+    }
+
+    .badge-risk-low {
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: rgba(46, 160, 67, 0.15);
+      color: #7ee787;
+      border: 1px solid rgba(46, 160, 67, 0.3);
+      font-weight: 600;
+    }
+
+    .fault-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.4;
+      flex: 1;
+    }
+
+    .fault-target {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: #79c0ff;
+      background: rgba(0, 0, 0, 0.35);
+      padding: 4px 8px;
+      border-radius: 4px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .fault-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 4px;
+    }
+
+    .btn-inject {
+      background: rgba(56, 139, 253, 0.15);
+      color: #79c0ff;
+      border: 1px solid rgba(56, 139, 253, 0.35);
+      border-radius: 5px;
+      padding: 4px 10px;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-family: var(--font-sans);
+    }
+
+    .btn-inject:hover {
+      background: var(--accent-blue);
+      color: white;
+      border-color: var(--accent-blue);
+      transform: translateY(-1px);
+      box-shadow: 0 0 10px rgba(56, 139, 253, 0.4);
+    }
+
+    .btn-inject-risk {
+      background: rgba(248, 81, 73, 0.15);
+      color: #ff7b72;
+      border-color: rgba(248, 81, 73, 0.35);
+    }
+
+    .btn-inject-risk:hover {
+      background: var(--color-fail);
+      color: white;
+      border-color: var(--color-fail);
+      box-shadow: 0 0 10px rgba(248, 81, 73, 0.4);
+    }
+
     /* Pipeline Stage Strip */
     .pipeline-strip {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 12px;
-      margin-top: 8px;
+      margin-top: 4px;
     }
 
     .stage-node {
@@ -188,13 +615,19 @@
     .stage-node.passed {
       border-color: rgba(46, 160, 67, 0.5);
       background: rgba(46, 160, 67, 0.1);
-      box-shadow: 0 0 12px rgba(46, 160, 67, 0.2);
+      box-shadow: 0 0 14px rgba(46, 160, 67, 0.25);
     }
 
     .stage-node.failed {
-      border-color: rgba(248, 81, 73, 0.5);
-      background: rgba(248, 81, 73, 0.12);
-      box-shadow: 0 0 16px rgba(248, 81, 73, 0.3);
+      border-color: rgba(248, 81, 73, 0.6);
+      background: rgba(248, 81, 73, 0.14);
+      box-shadow: 0 0 18px rgba(248, 81, 73, 0.35);
+      animation: failGlow 1.8s infinite alternate;
+    }
+
+    @keyframes failGlow {
+      from { border-color: rgba(248, 81, 73, 0.5); }
+      to { border-color: rgba(248, 81, 73, 0.95); }
     }
 
     .stage-node.running {
@@ -267,7 +700,7 @@
     .hypo-experiment {
       font-family: var(--font-mono);
       font-size: 11.5px;
-      background: rgba(0, 0, 0, 0.3);
+      background: rgba(0, 0, 0, 0.35);
       padding: 6px 10px;
       border-radius: 6px;
       color: #79c0ff;
@@ -297,14 +730,14 @@
 
     /* Human Approval Banner */
     .approval-modal {
-      background: linear-gradient(135deg, rgba(227, 179, 65, 0.15), rgba(248, 81, 73, 0.1));
+      background: linear-gradient(135deg, rgba(227, 179, 65, 0.15), rgba(248, 81, 73, 0.12));
       border: 1px solid var(--color-warn);
       border-radius: 10px;
-      padding: 16px 20px;
+      padding: 18px 22px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      box-shadow: 0 0 24px rgba(227, 179, 65, 0.2);
+      gap: 14px;
+      box-shadow: 0 0 28px rgba(227, 179, 65, 0.25);
       animation: alertPulse 2s infinite ease-in-out;
     }
 
@@ -330,11 +763,12 @@
     .approval-diff {
       font-family: var(--font-mono);
       font-size: 12px;
-      background: rgba(0, 0, 0, 0.4);
-      padding: 10px 14px;
+      background: rgba(0, 0, 0, 0.45);
+      padding: 12px 14px;
       border-radius: 6px;
       color: #f0f6fc;
       overflow-x: auto;
+      line-height: 1.5;
     }
 
     .approval-actions {
@@ -360,7 +794,7 @@
     .btn:hover { transform: translateY(-1px); filter: brightness(1.1); }
     .btn:active { transform: translateY(0); }
 
-    .btn-primary { background: linear-gradient(135deg, #1f6feb, #388bfd); color: white; }
+    .btn-primary { background: linear-gradient(135deg, #1f6feb, #388bfd); color: white; box-shadow: 0 0 12px rgba(56, 139, 253, 0.3); }
     .btn-danger { background: linear-gradient(135deg, #da3633, #f85149); color: white; }
     .btn-approve { background: linear-gradient(135deg, #238636, #2ea043); color: white; }
     .btn-reject { background: linear-gradient(135deg, #da3633, #f85149); color: white; }
@@ -442,7 +876,7 @@
     .handoff-box {
       font-family: var(--font-mono);
       font-size: 12px;
-      background: rgba(0, 0, 0, 0.4);
+      background: rgba(0, 0, 0, 0.45);
       padding: 14px;
       border-radius: 8px;
       color: #e6edf3;
@@ -450,13 +884,6 @@
       line-height: 1.45;
       max-height: 300px;
       overflow-y: auto;
-    }
-
-    /* Chaos Trigger Panel */
-    .chaos-panel {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
     }
   </style>
 </head>
@@ -468,7 +895,7 @@
       <div class="brand-logo">&#x2694;</div>
       <div>
         <div class="brand-title">LAZARUS-CI // MISSION CONTROL</div>
-        <div class="brand-subtitle">Autonomous SRE & Self-Healing CI/CD Pipeline Agent</div>
+        <div class="brand-subtitle">Autonomous SRE &amp; Self-Healing CI/CD Pipeline Agent</div>
       </div>
     </div>
     <div class="header-meta">
@@ -477,33 +904,91 @@
     </div>
   </header>
 
-  <!-- Pipeline Health & Chaos Trigger -->
+  <!-- Chaos Engineering Control Panel & Live Pipeline Strip -->
   <div class="card">
-    <div class="card-header">
-      <div class="card-title">Live Pipeline Execution State</div>
-      <div class="chaos-panel">
-        <button class="btn btn-primary" onclick="startIncident()">&#x26A1; Break Pipeline</button>
-        <button class="btn btn-secondary" onclick="runBenchmark()">&#x1F4CA; Run Benchmark (6x)</button>
+    <div class="chaos-container">
+      
+      <!-- Top Action Bar: Pitch Presets & Quick Controls -->
+      <div class="chaos-header-bar">
+        <div>
+          <div class="card-title">&#x26A1; Chaos Control Center &amp; Fault Injection Panel</div>
+          <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 2px;">
+            Inject realistic CI/CD faults into the sandbox to evaluate Lazarus autonomous triage, deterministic risk gate, and verifier.
+          </div>
+        </div>
+
+        <div class="chaos-actions">
+          <!-- Live Demo Presets for 5-Min Hackathon Pitch -->
+          <div class="demo-preset-group">
+            <span class="preset-label">&#x1F3AF; Pitch Presets:</span>
+            <button class="btn-preset auto-heal" onclick="startIncident('dependency_conflict')" title="Runs end-to-end autonomous triage, hypotheses, and verification with low-risk fix">&#x26A1; Auto-Heal</button>
+            <button class="btn-preset risk-gate" onclick="startIncident('secret_exposure')" title="Injects exposed API secret, forces deterministic Risk Gate pause for human approval">&#x1F6E1;&#xFE0F; Risk Gate</button>
+            <button class="btn-preset cascade" onclick="startIncident('procedural')" title="Procedural cascading multi-fault scenario where fix reveals downstream failure">&#x1F30A; Cascade</button>
+            <button class="btn-preset escalate" onclick="startIncident('bad_migration_sql')" title="Triggers verification retry limit and generates human SRE handoff report">&#x1F6A8; Escalate</button>
+          </div>
+
+          <!-- Quick Actions -->
+          <button class="btn btn-primary" id="btn-quick-break" onclick="startIncident()">&#x26A1; Break Pipeline</button>
+          <button class="btn btn-secondary" id="btn-toggle-drawer" onclick="toggleChaosDrawer()">&#x1F5C3;&#xFE0F; Fault Catalog (20)</button>
+          <button class="btn btn-secondary" onclick="runBenchmark()">&#x1F4CA; Benchmark (6x)</button>
+        </div>
       </div>
-    </div>
-    
-    <div id="pipeline-strip" class="pipeline-strip">
-      <div class="stage-node pending" id="stage-clone">
-        <div class="stage-name">1. Clone</div>
-        <div class="stage-status" id="status-clone">PENDING</div>
+
+      <!-- Active Chaos Status Banner -->
+      <div id="active-chaos-banner" class="active-chaos-banner">
+        <div class="active-chaos-info">
+          <div class="active-chaos-title">&#x26A0;&#xFE0F; <span id="active-fault-name">Chaos Injected</span></div>
+          <div class="active-chaos-meta" id="active-fault-meta">Target: services/api/app.py</div>
+          <span id="active-fault-risk" class="badge-risk-high">HIGH RISK (GATE)</span>
+        </div>
+        <div class="active-chaos-flow">
+          <span>&#x25B6; 1. Triage Logs</span> &rarr; <span>2. Hypotheses (H1..H3)</span> &rarr; <span>3. Experiments</span> &rarr; <span>4. Risk Gate</span> &rarr; <span>5. Verifier</span>
+        </div>
       </div>
-      <div class="stage-node pending" id="stage-build">
-        <div class="stage-name">2. Build</div>
-        <div class="stage-status" id="status-build">PENDING</div>
+
+      <!-- Expandable 20-Fault Chaos Matrix Drawer -->
+      <div id="chaos-drawer" class="chaos-drawer">
+        <div class="drawer-controls">
+          <div class="search-box">
+            <span style="color: var(--text-muted); font-size: 13px;">&#x1F50D;</span>
+            <input type="text" id="chaos-search" class="search-input" placeholder="Search 20 faults (e.g., secret, terraform, docker, sql)..." oninput="filterFaults()">
+          </div>
+
+          <div class="category-tabs">
+            <button class="cat-tab active" id="tab-all" onclick="setCategory('all')">All (20)</button>
+            <button class="cat-tab" id="tab-build" onclick="setCategory('build')">Build (5)</button>
+            <button class="cat-tab" id="tab-test" onclick="setCategory('test')">Test (1)</button>
+            <button class="cat-tab" id="tab-deploy" onclick="setCategory('deploy')">Deploy &amp; Runtime (7)</button>
+            <button class="cat-tab" id="tab-security" onclick="setCategory('security')">&#x1F6A8; Secrets / Risk Gate (4)</button>
+            <button class="cat-tab" id="tab-terraform" onclick="setCategory('terraform')">&#x2601;&#xFE0F; Terraform IaC (3)</button>
+          </div>
+        </div>
+
+        <div id="fault-grid" class="fault-grid">
+          <!-- Dynamically populated from CHAOS_CATALOG -->
+        </div>
       </div>
-      <div class="stage-node pending" id="stage-test">
-        <div class="stage-name">3. Test</div>
-        <div class="stage-status" id="status-test">PENDING</div>
+
+      <!-- Pipeline Execution Stage Strip -->
+      <div id="pipeline-strip" class="pipeline-strip">
+        <div class="stage-node pending" id="stage-clone">
+          <div class="stage-name">1. Clone</div>
+          <div class="stage-status" id="status-clone">PENDING</div>
+        </div>
+        <div class="stage-node pending" id="stage-build">
+          <div class="stage-name">2. Build</div>
+          <div class="stage-status" id="status-build">PENDING</div>
+        </div>
+        <div class="stage-node pending" id="stage-test">
+          <div class="stage-name">3. Test</div>
+          <div class="stage-status" id="status-test">PENDING</div>
+        </div>
+        <div class="stage-node pending" id="stage-deploy">
+          <div class="stage-name">4. Deploy</div>
+          <div class="stage-status" id="status-deploy">PENDING</div>
+        </div>
       </div>
-      <div class="stage-node pending" id="stage-deploy">
-        <div class="stage-name">4. Deploy</div>
-        <div class="stage-status" id="status-deploy">PENDING</div>
-      </div>
+
     </div>
   </div>
 
@@ -598,19 +1083,347 @@
   <script>
     const API_BASE = "";
     let activeIncidentId = null;
+    let selectedCategory = "all";
 
-    async function startIncident() {
+    // Canonical 20-Fault Catalog for instant rendering and offline resilience
+    const CHAOS_CATALOG = [
+      {
+        id: "dependency_conflict",
+        name: "Dependency Conflict",
+        category: "build",
+        stage: "build",
+        risk: "low",
+        target: "services/api/requirements.txt",
+        description: "Incompatible requests & urllib3 pins causing pip resolver failure during build.",
+        badge: "LOW RISK"
+      },
+      {
+        id: "docker_order",
+        name: "Dockerfile Layer Order",
+        category: "build",
+        stage: "build",
+        risk: "medium",
+        target: "Dockerfile",
+        description: "Source files copied before dependencies installed, breaking layer caching & build.",
+        badge: "MEDIUM RISK"
+      },
+      {
+        id: "merge_conflict",
+        name: "Git Merge Conflict Markers",
+        category: "build",
+        stage: "build",
+        risk: "medium",
+        target: "Dockerfile",
+        description: "Unresolved git conflict markers ('<<<<<<< HEAD') left in Dockerfile or application routes.",
+        badge: "MEDIUM RISK"
+      },
+      {
+        id: "missing_package_init",
+        name: "Missing Package __init__.py",
+        category: "build",
+        stage: "build",
+        risk: "medium",
+        target: "services/runtime_support/__init__.py",
+        description: "Python runtime support directory missing package __init__.py causing ModuleNotFoundError.",
+        badge: "MEDIUM RISK"
+      },
+      {
+        id: "bad_migration_sql",
+        name: "Bad Migration SQL Syntax",
+        category: "build",
+        stage: "build",
+        risk: "medium",
+        target: "db/migrations/001_init.sql",
+        description: "SQL syntax error inside database migration script causing schema initialization crash.",
+        badge: "MEDIUM RISK"
+      },
+      {
+        id: "secret_exposure",
+        name: "Hardcoded Secret Exposure",
+        category: "security",
+        stage: "build",
+        risk: "high",
+        target: "services/api/app.py",
+        description: "Sensitive API token/credential leaked in app code; triggers deterministic SRE Risk Gate.",
+        badge: "🚨 HIGH RISK (GATE)"
+      },
+      {
+        id: "log_pii_leak",
+        name: "PII & Credit Card Log Leak",
+        category: "security",
+        stage: "build",
+        risk: "high",
+        target: "services/api/routes.py",
+        description: "Unmasked credit card & user identity emitted directly to stdout/stderr application logs.",
+        badge: "🚨 HIGH RISK (GATE)"
+      },
+      {
+        id: "log_disabled",
+        name: "Logging Suppressed / Disabled",
+        category: "security",
+        stage: "build",
+        risk: "medium",
+        target: "services/api/logging_config.py",
+        description: "Logging level set to critical/disabled, creating blind spot for CI/CD observability pipelines.",
+        badge: "MEDIUM RISK"
+      },
+      {
+        id: "flaky_test",
+        name: "Non-Deterministic Flaky Test",
+        category: "test",
+        stage: "test",
+        risk: "low",
+        target: "tests/test_api.py",
+        description: "Asynchronous race condition causing intermittent test pipeline failures across test runs.",
+        badge: "LOW RISK"
+      },
+      {
+        id: "empty_secret_key",
+        name: "Empty SECRET_KEY Environment",
+        category: "security",
+        stage: "deploy",
+        risk: "high",
+        target: ".env",
+        description: "Blank SECRET_KEY variable in .env causing runtime session encryption failure at boot.",
+        badge: "🚨 HIGH RISK (GATE)"
+      },
+      {
+        id: "missing_permission",
+        name: "Container Network Permissions",
+        category: "deploy",
+        stage: "deploy",
+        risk: "medium",
+        target: "docker-compose.yml",
+        description: "Docker bridge network permission mismatch preventing inter-service communication.",
+        badge: "MEDIUM RISK"
+      },
+      {
+        id: "env_drift",
+        name: "Environment Variable Drift",
+        category: "deploy",
+        stage: "deploy",
+        risk: "medium",
+        target: "docker-compose.yml",
+        description: "Port and host configuration drift between compose service definition and runtime.",
+        badge: "MEDIUM RISK"
+      },
+      {
+        id: "invalid_database_url",
+        name: "Invalid DATABASE_URL Config",
+        category: "deploy",
+        stage: "deploy",
+        risk: "medium",
+        target: ".env",
+        description: "Malformed postgres database connection URL causing connection refused during health check.",
+        badge: "MEDIUM RISK"
+      },
+      {
+        id: "missing_pythonpath",
+        name: "Corrupted Virtualenv PYTHONPATH",
+        category: "deploy",
+        stage: "deploy",
+        risk: "medium",
+        target: ".venv/runtime.pth",
+        description: "Virtual environment path bootstrap corrupted, causing runtime module import errors.",
+        badge: "MEDIUM RISK"
+      },
+      {
+        id: "circular_import_runtime",
+        name: "Runtime Circular Import",
+        category: "deploy",
+        stage: "deploy",
+        risk: "medium",
+        target: "services/api/runtime_probe.py",
+        description: "Lazy circular import loop triggered only when handling runtime probe requests.",
+        badge: "MEDIUM RISK"
+      },
+      {
+        id: "none_config_runtime",
+        name: "NoneType Runtime Config Attribute",
+        category: "deploy",
+        stage: "deploy",
+        risk: "medium",
+        target: ".env",
+        description: "Unset configuration value evaluated to None causing AttributeError on first request.",
+        badge: "MEDIUM RISK"
+      },
+      {
+        id: "schema_drift",
+        name: "Database Schema Column Drift",
+        category: "deploy",
+        stage: "deploy",
+        risk: "medium",
+        target: "db/database.py",
+        description: "Application query column list out of sync with actual database migration schema.",
+        badge: "MEDIUM RISK"
+      },
+      {
+        id: "terraform_permission_denied",
+        name: "Terraform IAM Permission Denied",
+        category: "terraform",
+        stage: "deploy",
+        risk: "high",
+        target: "infra/main.tf",
+        description: "Cloud IAM policy denying terraform apply; requires deterministic SRE risk gate sign-off.",
+        badge: "🚨 HIGH RISK (GATE)"
+      },
+      {
+        id: "terraform_invalid_provider",
+        name: "Terraform Invalid Provider Registry",
+        category: "terraform",
+        stage: "deploy",
+        risk: "high",
+        target: "infra/main.tf",
+        description: "Malformed provider block in main.tf pointing to non-existent registry source.",
+        badge: "🚨 HIGH RISK (GATE)"
+      },
+      {
+        id: "terraform_missing_variable",
+        name: "Terraform Missing Required Variable",
+        category: "terraform",
+        stage: "deploy",
+        risk: "medium",
+        target: "infra/terraform.tfvars",
+        description: "Required infrastructure input variable missing from terraform.tfvars breaking plan.",
+        badge: "MEDIUM RISK"
+      }
+    ];
+
+    // Toggle Chaos Drawer
+    function toggleChaosDrawer() {
+      const drawer = document.getElementById("chaos-drawer");
+      const btn = document.getElementById("btn-toggle-drawer");
+      if (drawer.style.display === "flex") {
+        drawer.style.display = "none";
+        btn.innerHTML = "&#x1F5C3;&#xFE0F; Fault Catalog (20)";
+      } else {
+        drawer.style.display = "flex";
+        btn.innerHTML = "&#x2716; Close Catalog";
+        renderFaultCatalog();
+      }
+    }
+
+    // Filter Category Tabs
+    function setCategory(cat) {
+      selectedCategory = cat;
+      const tabs = ["all", "build", "test", "deploy", "security", "terraform"];
+      tabs.forEach(t => {
+        const el = document.getElementById(`tab-${t}`);
+        if (el) {
+          el.className = (t === cat) 
+            ? (t === "security" ? "cat-tab active-risk" : "cat-tab active") 
+            : "cat-tab";
+        }
+      });
+      filterFaults();
+    }
+
+    // Filter Fault Cards by Search Query & Category
+    function filterFaults() {
+      const query = (document.getElementById("chaos-search")?.value || "").toLowerCase().trim();
+      const filtered = CHAOS_CATALOG.filter(f => {
+        const matchCat = (selectedCategory === "all") || (f.category === selectedCategory);
+        const matchQuery = !query || 
+          f.name.toLowerCase().includes(query) || 
+          f.id.toLowerCase().includes(query) || 
+          f.target.toLowerCase().includes(query) || 
+          f.description.toLowerCase().includes(query);
+        return matchCat && matchQuery;
+      });
+      renderFaultCards(filtered);
+    }
+
+    // Render Fault Catalog Grid
+    function renderFaultCatalog() {
+      filterFaults();
+    }
+
+    function renderFaultCards(items) {
+      const grid = document.getElementById("fault-grid");
+      if (!grid) return;
+      if (items.length === 0) {
+        grid.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; color: var(--text-dim); padding: 24px;">No chaos faults match your filter query.</div>`;
+        return;
+      }
+
+      grid.innerHTML = items.map(f => {
+        const riskClass = f.risk === "high" ? "risk-high" : (f.risk === "medium" ? "risk-medium" : "risk-low");
+        const badgeClass = f.risk === "high" ? "badge-risk-high" : (f.risk === "medium" ? "badge-risk-med" : "badge-risk-low");
+        const btnClass = f.risk === "high" ? "btn-inject btn-inject-risk" : "btn-inject";
+
+        return `
+          <div class="fault-card ${riskClass}">
+            <div class="fault-top">
+              <div class="fault-name">${f.name}</div>
+              <div class="fault-badges">
+                <span class="badge-stage">${f.stage}</span>
+                <span class="${badgeClass}">${f.badge}</span>
+              </div>
+            </div>
+            <div class="fault-target">&#x1F4C1; ${f.target}</div>
+            <div class="fault-desc">${f.description}</div>
+            <div class="fault-footer">
+              <span style="font-family: var(--font-mono); font-size: 11px; color: var(--text-dim);">${f.id}</span>
+              <button class="${btnClass}" onclick="startIncident('${f.id}')">
+                &#x26A1; Inject Fault
+              </button>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    // Display Active Chaos Injected Banner
+    function showActiveChaos(faultId) {
+      const banner = document.getElementById("active-chaos-banner");
+      if (!banner) return;
+      
+      const f = CHAOS_CATALOG.find(item => item.id === faultId);
+      if (f) {
+        banner.style.display = "flex";
+        document.getElementById("active-fault-name").textContent = `Chaos Injected: ${f.name}`;
+        document.getElementById("active-fault-meta").textContent = `Target: ${f.target} [Stage: ${f.stage.toUpperCase()}]`;
+        const riskEl = document.getElementById("active-fault-risk");
+        riskEl.className = f.risk === "high" ? "badge-risk-high" : (f.risk === "medium" ? "badge-risk-med" : "badge-risk-low");
+        riskEl.textContent = f.badge;
+      } else if (faultId) {
+        banner.style.display = "flex";
+        document.getElementById("active-fault-name").textContent = `Chaos Injected: ${faultId}`;
+        document.getElementById("active-fault-meta").textContent = `Adaptive curriculum scenario active`;
+        const riskEl = document.getElementById("active-fault-risk");
+        riskEl.className = "badge-risk-med";
+        riskEl.textContent = "AUTONOMOUS MODE";
+      } else {
+        banner.style.display = "flex";
+        document.getElementById("active-fault-name").textContent = `Pipeline Breakdown Injected`;
+        document.getElementById("active-fault-meta").textContent = `Curriculum-selected fault scenario`;
+        const riskEl = document.getElementById("active-fault-risk");
+        riskEl.className = "badge-risk-med";
+        riskEl.textContent = "CURRICULUM EPISODE";
+      }
+    }
+
+    // Trigger incident start
+    async function startIncident(faultId = null) {
+      const btnBreak = document.getElementById("btn-quick-break");
       try {
+        if (btnBreak) btnBreak.textContent = "⏳ Injecting...";
+        const payload = faultId ? { fault: faultId } : {};
+
         const res = await fetch(`${API_BASE}/incident/start`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({})
+          body: JSON.stringify(payload)
         });
         const data = await res.json();
         activeIncidentId = data.incident_id;
+
+        showActiveChaos(faultId);
         pollState();
       } catch (err) {
         console.error("Failed to start incident:", err);
+      } finally {
+        if (btnBreak) btnBreak.textContent = "⚡ Break Pipeline";
       }
     }
 
@@ -804,6 +1617,22 @@
           renderStages(inc.stages);
           renderApproval(inc);
           renderHandoff(inc);
+
+          // Update active chaos banner if fault known
+          if (inc.fault) {
+            showActiveChaos(inc.fault);
+          } else if (inc.status === "resolved") {
+            const banner = document.getElementById("active-chaos-banner");
+            if (banner) {
+              banner.style.display = "flex";
+              banner.style.borderColor = "var(--color-pass)";
+              document.getElementById("active-fault-name").textContent = "All Pipeline Faults Remediated";
+              document.getElementById("active-fault-meta").textContent = "Independent verifier passed";
+              const riskEl = document.getElementById("active-fault-risk");
+              riskEl.className = "badge-risk-low";
+              riskEl.textContent = "RECOVERED";
+            }
+          }
         }
 
         renderHypotheses(events);
@@ -814,6 +1643,8 @@
       }
     }
 
+    // Initialize Fault Catalog & Start Polling
+    renderFaultCatalog();
     setInterval(pollState, 1000);
     pollState();
   </script>
