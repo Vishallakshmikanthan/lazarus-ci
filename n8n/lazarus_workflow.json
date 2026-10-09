@@ -11,22 +11,24 @@
       "parameters": {
         "httpMethod": "POST",
         "path": "lazarus-alert",
+        "responseMode": "onReceived",
         "options": {}
       },
       "id": "node-webhook-1",
       "name": "Webhook: Pipeline Alert",
       "type": "n8n-nodes-base.webhook",
-      "typeVersion": 1,
+      "typeVersion": 2,
+      "webhookId": "9a75d5a6-9d3e-4b2a-89f5-19e917d23f4a",
       "position": [240, 300]
     },
     {
       "parameters": {
-        "requestMethod": "POST",
+        "method": "POST",
         "url": "http://host.docker.internal:8100/incident/start",
-        "options": {},
-        "bodyParametersUi": {
-          "parameter": []
-        }
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.body || $json) }}",
+        "options": {}
       },
       "id": "node-start-incident-2",
       "name": "HTTP: Start Lazarus Incident",
@@ -95,7 +97,7 @@
     },
     {
       "parameters": {
-        "chatId": "={{ $env.TELEGRAM_CHAT_ID || '-100123456789' }}",
+        "chatId": "",
         "text": "=🚨 Lazarus SRE Incident #{{ $('Set: Remember Incident ID').item.json.incident_id }} Update:\nStatus: {{ $json.status.toUpperCase() }}\nSummary: {{ $json.summary || 'Pipeline remediated and verified' }}",
         "additionalFields": {}
       },
