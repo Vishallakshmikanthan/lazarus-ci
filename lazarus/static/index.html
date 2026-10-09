@@ -12,17 +12,17 @@
     rel="stylesheet">
   <style>
     :root {
-      /* Backgrounds: Light Blue Executive Gradient & Pure White Card Layers */
-      --bg-page: #f0f7ff;
-      --card-bg: #ffffff;
-      --panel-bg: #ffffff;
-      --card-inner: #f8fafc;
+      /* Backgrounds: Light Blue Executive Gradient & Half-White Frosted Glass Layers */
+      --bg-page: #edf5fd;
+      --card-bg: rgba(255, 255, 255, 0.78);
+      --panel-bg: rgba(255, 255, 255, 0.78);
+      --card-inner: rgba(243, 248, 255, 0.75);
       --dark-layer: #0b1120;
       --dark-layer-elevated: #131d33;
 
-      /* Borders */
-      --border-subtle: #e2e8f0;
-      --border-card: rgba(191, 219, 254, 0.85);
+      /* Borders: Soft Frosted Ice-Blue Borders */
+      --border-subtle: rgba(203, 224, 252, 0.7);
+      --border-card: rgba(186, 215, 250, 0.7);
       --border-glow: rgba(37, 99, 235, 0.45);
       
       /* High-Contrast Bright Black Text on White */
@@ -192,16 +192,18 @@
       }
     }
 
-    /* Cards (Crisp High-Contrast White Surface) */
+    /* Cards (Frosted Half-White Glass Surface that Blends with the Blue Gradient) */
     .card {
       background: var(--card-bg);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
       border: 1px solid var(--border-card);
       border-radius: 14px;
       padding: 22px;
       display: flex;
       flex-direction: column;
       gap: 16px;
-      box-shadow: var(--shadow-card);
+      box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.06), 0 4px 12px -2px rgba(15, 23, 42, 0.03);
     }
 
     .card-header {
@@ -685,28 +687,30 @@
     }
 
     .stage-node {
-      background: #f8fafc;
-      border: 1.5px solid #cbd5e1;
+      background: rgba(248, 251, 255, 0.76);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1.5px solid rgba(203, 224, 252, 0.85);
       border-radius: 10px;
       padding: 14px;
       text-align: center;
       transition: all 0.25s ease;
       position: relative;
-      box-shadow: 0 4px 10px rgba(15, 23, 42, 0.04);
+      box-shadow: 0 4px 10px rgba(15, 23, 42, 0.03);
     }
 
     .stage-node.passed {
       border-color: #16a34a;
-      background: #f0fdf4;
-      box-shadow: 0 4px 14px rgba(22, 163, 74, 0.2);
+      background: rgba(240, 253, 244, 0.85);
+      box-shadow: 0 4px 14px rgba(22, 163, 74, 0.18);
     }
     .stage-node.passed .stage-name { color: #166534; }
     .stage-node.passed .stage-status { color: #15803d; font-weight: 700; }
 
     .stage-node.failed {
       border-color: #dc2626;
-      background: #fef2f2;
-      box-shadow: 0 4px 16px rgba(220, 38, 38, 0.25);
+      background: rgba(254, 242, 242, 0.85);
+      box-shadow: 0 4px 16px rgba(220, 38, 38, 0.2);
       animation: failGlow 1.8s infinite alternate;
     }
     .stage-node.failed .stage-name { color: #991b1b; }
@@ -719,8 +723,8 @@
 
     .stage-node.running {
       border-color: #2563eb;
-      background: #eff6ff;
-      box-shadow: 0 4px 16px rgba(37, 99, 235, 0.25);
+      background: rgba(239, 246, 255, 0.85);
+      box-shadow: 0 4px 16px rgba(37, 99, 235, 0.2);
       animation: stagePulse 1.2s infinite;
     }
     .stage-node.running .stage-name { color: #1e40af; }
@@ -759,20 +763,23 @@
     }
 
     .hypo-card {
-      background: #ffffff;
-      border: 1px solid #cbd5e1;
+      background: rgba(255, 255, 255, 0.72);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(191, 219, 254, 0.65);
       border-radius: 10px;
       padding: 16px;
       display: flex;
       flex-direction: column;
       gap: 8px;
-      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
       transition: all 0.2s ease;
     }
 
     .hypo-card:hover {
-      border-color: #93c5fd;
+      border-color: #60a5fa;
       transform: translateY(-1px);
+      background: rgba(255, 255, 255, 0.85);
     }
 
     .hypo-header {
@@ -798,19 +805,18 @@
     .hypo-experiment {
       font-family: var(--font-mono);
       font-size: 11.5px;
-      background: #f0f9ff;
+      background: rgba(240, 249, 255, 0.85);
       padding: 8px 12px;
       border-radius: 6px;
       color: #0369a1;
-      border-left: 3px solid #0284c7;
-      border: 1px solid #bae6fd;
-      border-left-width: 4px;
+      border: 1px solid rgba(186, 230, 253, 0.75);
+      border-left: 4px solid #0284c7;
     }
 
     .hypo-evidence {
       font-size: 12.5px;
       color: #334155;
-      border-left: 3px solid #cbd5e1;
+      border-left: 3px solid rgba(148, 163, 184, 0.7);
       padding-left: 10px;
       margin-top: 2px;
       font-weight: 500;
@@ -983,21 +989,23 @@
       gap: 12px;
       font-size: 13px;
       padding: 9px 14px;
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
+      background: rgba(248, 251, 255, 0.72);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(219, 234, 254, 0.65);
       border-radius: 8px;
       border-left: 4px solid var(--border-subtle);
     }
 
-    .timeline-item.alert { border-left-color: #dc2626; background: #fff5f5; }
-    .timeline-item.triage { border-left-color: #0284c7; background: #f0f9ff; }
-    .timeline-item.hypotheses { border-left-color: #7c3aed; background: #faf5ff; }
-    .timeline-item.experiment { border-left-color: #2563eb; background: #eff6ff; }
-    .timeline-item.verdicts { border-left-color: #d97706; background: #fffbeb; }
-    .timeline-item.apply { border-left-color: #2563eb; background: #eff6ff; }
-    .timeline-item.verify { border-left-color: #16a34a; background: #f0fdf4; }
-    .timeline-item.resolved { border-left-color: #16a34a; background: #f0fdf4; }
-    .timeline-item.escalated { border-left-color: #dc2626; background: #fef2f2; }
+    .timeline-item.alert { border-left-color: #dc2626; background: rgba(254, 242, 242, 0.75); }
+    .timeline-item.triage { border-left-color: #0284c7; background: rgba(240, 249, 255, 0.75); }
+    .timeline-item.hypotheses { border-left-color: #7c3aed; background: rgba(250, 245, 255, 0.75); }
+    .timeline-item.experiment { border-left-color: #2563eb; background: rgba(239, 246, 255, 0.75); }
+    .timeline-item.verdicts { border-left-color: #d97706; background: rgba(255, 251, 235, 0.75); }
+    .timeline-item.apply { border-left-color: #2563eb; background: rgba(239, 246, 255, 0.75); }
+    .timeline-item.verify { border-left-color: #16a34a; background: rgba(240, 253, 244, 0.75); }
+    .timeline-item.resolved { border-left-color: #16a34a; background: rgba(240, 253, 244, 0.75); }
+    .timeline-item.escalated { border-left-color: #dc2626; background: rgba(254, 242, 242, 0.75); }
 
     .item-kind {
       font-family: var(--font-mono);
@@ -1014,7 +1022,7 @@
       font-weight: 500;
     }
 
-    /* Benchmarking & Handoff Table (Crisp White with Bright Black Contrast) */
+    /* Benchmarking & Handoff Table (Frosted Half-White Contrast) */
     .bench-table {
       width: 100%;
       border-collapse: collapse;
@@ -1025,7 +1033,7 @@
     .bench-table td {
       padding: 11px 14px;
       text-align: left;
-      border-bottom: 1px solid #e2e8f0;
+      border-bottom: 1px solid rgba(226, 238, 254, 0.75);
       color: var(--text-main);
     }
 
@@ -1035,7 +1043,7 @@
       text-transform: uppercase;
       font-size: 11px;
       letter-spacing: 0.6px;
-      background: #f8fafc;
+      background: rgba(239, 246, 255, 0.7);
     }
 
     .bench-highlight {
